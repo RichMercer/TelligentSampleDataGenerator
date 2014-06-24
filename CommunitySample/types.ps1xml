@@ -1,0 +1,46 @@
+﻿<Types>
+    <Type>
+        <!-- Support for serialization - based on http://blogs.msdn.com/b/powershell/archive/2007/05/01/object-serialization-directives.aspx -->
+        <Name>CommunityCredential</Name>
+        <Members>
+            <MemberSet>
+                <Name>PSStandardMembers</Name>
+                <Members>
+        		    <NoteProperty>
+                        <Name>SerializationDepth</Name>
+                        <Value>1</Value>
+                    </NoteProperty>
+                    <!--
+                    <NoteProperty>
+                        <Name>SerializationMethod</Name>
+                        <Value>SpecificProperties</Value>
+                    </NoteProperty>
+                    <PropertySet>
+                        <Name>PropertySerializationSet</Name>
+                        <ReferencedProperties>
+                            <Name>Root</Name>
+                            <Name>Username</Name>
+                            <Name>ApiKey</Name>
+                            <Name>HttpCredential</Name>
+                        </ReferencedProperties>
+                    </PropertySet>-->
+                </Members>
+            </MemberSet>
+        </Members>
+    </Type>
+    <!-- Based on example of PSCrednetial http://blogs.msdn.com/b/powershell/archive/2010/01/07/how-objects-are-sent-to-and-from-remote-sessions.aspx -->
+    <Type>
+        <Name>Deserialized.CommunityCredential</Name>
+         <Members>
+             <MemberSet>
+                <Name>PSStandardMembers</Name>
+                <Members>
+                    <NoteProperty>
+                        <Name>TargetTypeForDeserialization</Name>
+                        <Value>Microsoft.PowerShell.DeserializingTypeConverter</Value>
+                    </NoteProperty>
+                </Members>
+              </MemberSet>
+          </Members>
+    </Type>
+</Types>
