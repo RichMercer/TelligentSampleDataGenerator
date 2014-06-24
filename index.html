@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Sample Data Generator for Zimbra Community : Generates Sample data for test purposes in Zimbra Community." />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Sample Data Generator for Zimbra Community</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/afscrome/SampleDataGenerator">View on GitHub</a>
+
+          <h1 id="project_title">Sample Data Generator for Zimbra Community</h1>
+          <h2 id="project_tagline">Generates Sample data for test purposes in Zimbra Community.</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/afscrome/SampleDataGenerator/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/afscrome/SampleDataGenerator/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p>The sample data generation scripts can be used to populate a community with sample data for testing purposes.  They can either be used to create a whole community from scratch (e.g. create 5 groups, each with 3 sub groups, each of which should be popualted with content), or can be used with some level of explicit structure followed by random data (e.g. create a Departments group with sub groups Support and Engineering.  Create a News group etc.  Populate all these with sample content).</p>
+
+<p>These scripts have been tested with 7.6 and 8.0, although they use REST and so should be mostly compatible with previous versions.</p>
+
+<p>The current weightings of how we decide how much data to generate is based around generating sample data for test purposes (e.g. 50% of content that supports ratings will have 1 or more ratings).  Although some of the building blocks behind these scripts could be reused to generate more realistic data.  (e.g. if you wnt to create 1000 forum threads, you can just use the Initialize-CommunitySampleForum command with a ThreadCount of 1000.</p>
+
+<h2>
+<a name="credentials" class="anchor" href="#credentials"><span class="octicon octicon-link"></span></a>Credentials</h2>
+
+<p>The most important command is the New-CommunityCredential command.  This contains the details for accessing your community, that is required by all the sample data generation functions</p>
+
+<div class="highlight highlight-powershell"><pre><span class="nv">$cred</span> <span class="p">=</span> <span class="nb">New-CommunityCredential</span> <span class="n">-CommunityRoot</span> <span class="n">http</span><span class="err">:</span><span class="p">//</span><span class="n">community</span><span class="p">.</span><span class="n">com</span><span class="p">/</span> <span class="n">-Username</span> <span class="n">username</span> <span class="err">–</span><span class="n">ApiKey</span> <span class="n">apiKey</span>
+</pre></div>
+
+<p>There is also an alias of ncc so a shorter way of creating this command is</p>
+
+<div class="highlight highlight-powershell"><pre><span class="nv">$cred</span> <span class="p">=</span> <span class="n">ncc</span> <span class="n">http</span><span class="err">:</span><span class="p">//</span><span class="n">community</span><span class="p">.</span><span class="n">com</span><span class="p">/</span> <span class="n">admin</span> <span class="n">abc123</span>
+</pre></div>
+
+<p>If using windows auth, you can specify HTTP Credentials to be used on the request</p>
+
+<div class="highlight highlight-powershell"><pre><span class="nv">$httpCreds</span> <span class="p">=</span> <span class="nb">Get-Credential</span>
+<span class="c">#Type credentials at prompt</span>
+<span class="nv">$cred</span> <span class="p">=</span> <span class="n">ncc</span> <span class="n">http</span><span class="err">:</span><span class="p">//</span><span class="n">community</span><span class="p">.</span><span class="n">com</span><span class="p">/</span> <span class="n">admin</span> <span class="n">abc123</span> <span class="err">–</span><span class="n">HttpCredentials</span> <span class="nv">$httpCred</span> 
+</pre></div>
+
+<h2>
+<a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples</h2>
+
+<p>Populate all applications in an existing group with sample content</p>
+
+<div class="highlight highlight-powershell"><pre><span class="nv">$cred</span> <span class="p">=</span> <span class="nb">New-CommunityCredential</span> <span class="n">http</span><span class="err">:</span><span class="p">//</span><span class="n">mycommunity</span><span class="p">.</span><span class="n">local</span><span class="p">/</span> <span class="n">admin</span> <span class="n">abc123</span>
+<span class="n">Initialize-CommunitySampleGroup</span> <span class="n">-GroupId</span> <span class="n">3</span> <span class="n">-Credential</span> <span class="nv">$cred</span>
+</pre></div>
+
+<p>Create 1000 threads within a specific forum</p>
+
+<div class="highlight highlight-powershell"><pre><span class="nv">$cred</span> <span class="p">=</span> <span class="n">ncc</span> <span class="n">http</span><span class="err">:</span><span class="p">//</span><span class="n">mycommunity</span><span class="p">.</span><span class="n">local</span><span class="p">/</span> <span class="n">admin</span> <span class="n">abc123</span>
+<span class="n">Initialize-CommunitySampleForum</span> <span class="n">-ForumId</span> <span class="n">265</span> <span class="n">-ThreadCount</span> <span class="n">1000</span> <span class="n">-Credential</span> <span class="nv">$cred</span> <span class="p">}</span>
+</pre></div>
+
+<p>Create 5 empty wikis in a specific group</p>
+
+<div class="highlight highlight-powershell"><pre><span class="nv">$cred</span> <span class="p">=</span> <span class="n">ncc</span> <span class="n">http</span><span class="err">:</span><span class="p">//</span><span class="n">mycommunity</span><span class="p">.</span><span class="n">local</span><span class="p">/</span> <span class="n">admin</span> <span class="n">abc123</span>
+<span class="n">1</span><span class="p">..</span><span class="n">5</span> <span class="p">|%</span> <span class="p">{</span> <span class="nb">New-CommunitySampleWiki</span> <span class="n">-GroupId</span> <span class="n">43</span> <span class="n">-Credential</span> <span class="nv">$cred</span> <span class="p">}</span>
+</pre></div>
+
+<p>Create 2 new blogs in a group, and populate them with dummy content</p>
+
+<div class="highlight highlight-powershell"><pre><span class="nv">$cred</span> <span class="p">=</span> <span class="n">ncc</span> <span class="n">http</span><span class="err">:</span><span class="p">//</span><span class="n">mycommunity</span><span class="p">.</span><span class="n">local</span><span class="p">/</span> <span class="n">admin</span> <span class="n">abc123</span>
+<span class="n">1</span><span class="p">..</span><span class="n">2</span> <span class="p">|%</span> <span class="p">{</span>
+    <span class="nv">$blog</span> <span class="p">=</span> <span class="nb">New-CommunitySampleBlog</span> <span class="n">-GroupId</span> <span class="n">2</span> <span class="n">-Credential</span> <span class="nv">$cred</span>
+    <span class="n">Initialize-CommunitySampleBlog</span> <span class="n">-BlogId</span> <span class="nv">$blog</span><span class="p">.</span><span class="n">Id</span> <span class="n">-Credential</span> <span class="nv">$cred</span> 
+<span class="p">}</span>
+</pre></div>
+
+<p>Populate content in all groups in the community</p>
+
+<div class="highlight highlight-powershell"><pre><span class="nb">Get-CommunityGroup</span> <span class="n">-IncludeAllSubGroups</span> <span class="nv">$true</span> <span class="n">-Credential</span> <span class="nv">$cred</span> <span class="p">|%</span> <span class="p">{</span>
+    <span class="n">Initialize-CommunitySampleGroup</span> <span class="n">-GroupId</span> <span class="nv">$_</span><span class="p">.</span><span class="n">Id</span> <span class="n">-Credential</span> <span class="nv">$cred</span> <span class="p">|</span> <span class="nb">Out-Null</span>
+<span class="p">}</span>
+</pre></div>
+
+<h2>
+<a name="architecture" class="anchor" href="#architecture"><span class="octicon octicon-link"></span></a>Architecture</h2>
+
+<h3>
+<a name="communiytrest" class="anchor" href="#communiytrest"><span class="octicon octicon-link"></span></a>CommuniytRest</h3>
+
+<p>The Community Rest module is an API to interact with the community REST API.  It is mostly code generated from the community using the code which can be found at <a href="https://svn.telligenthosting.net/svn/employees/Alex_Crome/PowershellRest/">https://svn.telligenthosting.net/svn/employees/Alex_Crome/PowershellRest/</a> </p>
+
+<h3>
+<a name="communitysample" class="anchor" href="#communitysample"><span class="octicon octicon-link"></span></a>CommunitySample</h3>
+
+<p>The CommunitySample module is where the real magic happens.  This uses some custom logic to determine quantities and generate random content (see below for more detail on the methodology), and then interacts with the CommunityRest module to populate content in the community.</p>
+
+<h2>
+<a name="sample-data-generation-methodology" class="anchor" href="#sample-data-generation-methodology"><span class="octicon octicon-link"></span></a>Sample Data Generation Methodology</h2>
+
+<p>Textual data is generated as follows.  The exact lists can be found in the .txt files in the CommunitySample module.</p>
+
+<ul>
+<li>Application / Group names are based on a list of sports</li>
+<li>Subjects are the union of several sets of data:
+
+<ul>
+<li>Fairy Tales</li>
+<li>Place Names</li>
+<li>Recent UK Number 1 Singles</li>
+<li>Some Lorem Ipsum generated junk</li>
+</ul>
+</li>
+<li>Post / Comment bodies are based on stitching together random paragraphs from Peter Pan (the book is now public domain)</li>
+<li>Usernames are based upon joining a random forename to a random surname</li>
+<li>Tags are based on a list of animals</li>
+</ul><p>Where content uses core services out of the box, these items will have content randomly generated in the core services.  e.g. wikis will have a 50% probability of having ratings, and a 50% probability of being liked, and a 50% probability of having tags.</p>
+
+<h2>
+<a name="command-list" class="anchor" href="#command-list"><span class="octicon octicon-link"></span></a>Command List</h2>
+
+<p>Below is a list of commands in the CommunitySample module - further information on these commands can be found using Get-Help.</p>
+
+<ul>
+<li>Get-RandomApplicationName</li>
+<li>Get-RandomBiasedCommentCount</li>
+<li>Get-RandomExternalUrl</li>
+<li>Get-RandomFile</li>
+<li>Get-RandomHtml</li>
+<li>Get-RandomName</li>
+<li>Get-RandomTag</li>
+<li>Get-RandomTitle</li>
+<li>Initialize-CommunitySampleBlog</li>
+<li>Initialize-CommunitySampleBlogPost</li>
+<li>Initialize-CommunitySampleComment</li>
+<li>Initialize-CommunitySampleContentCoreService</li>
+<li>Initialize-CommunitySampleForum</li>
+<li>Initialize-CommunitySampleForumThread</li>
+<li>Initialize-CommunitySampleGallery</li>
+<li>Initialize-CommunitySampleGalleryFile</li>
+<li>Initialize-CommunitySampleGroup</li>
+<li>Initialize-CommunitySampleGroupMember</li>
+<li>Initialize-CommunitySampleLike</li>
+<li>Initialize-CommunitySampleRating</li>
+<li>Initialize-CommunitySampleTag</li>
+<li>Initialize-CommunitySampleUser</li>
+<li>Initialize-CommunitySampleWiki</li>
+<li>Initialize-CommunitySampleWikiPage</li>
+<li>New-CommunitySampleBlog</li>
+<li>New-CommunitySampleForum</li>
+<li>New-CommunitySampleGallery</li>
+<li>New-CommunitySampleGroup</li>
+<li>New-CommunitySampleWiki</li>
+<li>Test-Probability</li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Sample Data Generator for Zimbra Community maintained by <a href="https://github.com/afscrome">afscrome</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
