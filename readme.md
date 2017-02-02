@@ -1,4 +1,4 @@
-#Sample Data Generator for Zimbra Commnity
+#Sample Data Generator for Telligent Commnity
 
 The sample data generation scripts can be used to populate a community with sample data for testing purposes.  They can either be used to create a whole community from scratch (e.g. create 5 groups, each with 3 sub groups, each of which should be popualted with content), or can be used with some level of explicit structure followed by random data (e.g. create a Departments group with sub groups Support and Engineering.  Create a News group etc.  Populate all these with sample content).
 
@@ -11,7 +11,7 @@ The current weightings of how we decide how much data to generate is based aroun
 The most important command is the New-CommunityCredential command.  This contains the details for accessing your community, that is required by all the sample data generation functions
 
 ```powershell
-$cred = New-CommunityCredential -CommunityRoot http://community.com/ -Username username –ApiKey apiKey
+$cred = New-CommunityCredential -CommunityRoot http://community.com/ -Username username â€“ApiKey apiKey
 ```
 There is also an alias of ncc so a shorter way of creating this command is
 ```powershell
@@ -23,7 +23,7 @@ If using windows auth, you can specify HTTP Credentials to be used on the reques
 ```powershell
 $httpCreds = Get-Credential
 #Type credentials at prompt
-$cred = ncc http://community.com/ admin abc123 –HttpCredentials $httpCred 
+$cred = ncc http://community.com/ admin abc123 â€“HttpCredentials $httpCred 
 ```
 
 ##Examples
