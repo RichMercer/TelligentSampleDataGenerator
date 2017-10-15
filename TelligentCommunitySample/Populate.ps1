@@ -223,7 +223,6 @@ function Initialize-CommunitySampleWiki {
     }
 }
 
-
 function Initialize-CommunitySampleForumThread {
     <#
         .SYNOPSIS
@@ -266,12 +265,16 @@ function Initialize-CommunitySampleForumThread {
                 -Credential $Credential
 
             $replyCount = Get-RandomBiasedCommentCount -Max 40
+            $parentReplyId = -1
+
             for ($i = 1; $i -le $replyCount; $i++) {
                 Write-Progress 'Sample Data' 'Creating Forum Reply' -PercentComplete (($i - 1)/$replyCount * 100) -CurrentOperation "$i of $replyCount" -Id 804
+                
                 $reply = New-CommunityForumreply `
                     -ThreadId $thread.Id `
                     -Body (Get-RandomHtml 3) `
                     -Credential $Credential `
+					-ParentReplyId $parentReplyId `
                     -Impersonate ($Username | Get-Random -ea SilentlyContinue)
 
                 if($reply) {
@@ -279,6 +282,14 @@ function Initialize-CommunitySampleForumThread {
                         -Like -Tag -Rate `
                         -Username $username `
                         -Credential $Credential
+
+                    $switch = Get-Random -Minimum 0 -Maximum 3
+                    switch($switch){
+                        0 { $parentReplyId = -1 }                    
+                        1 { $parentReplyId = $reply.Id }                    
+                        2 { $parentReplyId = $parentReplyId }                    
+                    }   
+                 
                 }
 
             }
@@ -323,7 +334,7 @@ function Initialize-CommunitySampleBlogPost {
 
         if($post) {
             $post
-            $post | Initialize-CommunitySampleContentCoreService  `
+            $post | Initialize-CommunitySampleContentCoreService `
                 -Comment `
                 -Like `
                 -Tag `
@@ -684,6 +695,7 @@ function Initialize-CommunitySampleComment {
     )
     process {
         $commentCount = Get-RandomBiasedCommentCount
+        $parentCommentId = ''
 
         for ($i = 1; $i -le $commentCount; $i ++) {
             Write-Progress 'Sample Data' "Creating Comments" -PercentComplete (($i - 1)/$commentCount * 100) -CurrentOperation "$i of $commentCount" -Id 805
@@ -691,22 +703,38 @@ function Initialize-CommunitySampleComment {
             0..(Get-Random -Min 0 -Max 3) |% {
                 $body += "$($dummyData.Paragraphs | Get-Random)`r`n"
             }
+            
+            $params = @{
+                ContentId = $ContentId
+                ContentTypeId = $ContentTypeId
+                Body = $body
+                Credential = $Credential
+                Impersonate = ($Username | Get-Random -ea SilentlyContinue)
+            }
 
-            $comment = New-CommunityComment -ContentId $ContentId `
-                -ContentTypeId $ContentTypeId `
-                -Body $body `
-                -Credential $Credential `
-                -Impersonate ($Username | Get-Random -ea SilentlyContinue)
+            if($parentCommentId){
+                $params.Add("ParentCommentId", $parentCommentId)
+            }
+            
+            $comment = New-CommunityComment @params
 
-            $comment
+            if($comment) {
+                $switch = Get-Random -Minimum 0 -Maximum 3
+                    switch($switch){
+                        0 { $parentCommentId = '' }                    
+                        1 { $parentCommentId = $comment.CommentId }                    
+                        2 { $parentCommentId = $parentCommentId }                    
+                    }   
 
-            Initialize-CommunitySampleContentCoreService `
-                -ContentId $comment.CommentId `
-                -ContentTypeId $comment.CommentContentTypeId `
-                -Like `
-                -Username $Username `
-                -Credential $Credential
 
+            
+                Initialize-CommunitySampleContentCoreService `
+                    -ContentId $comment.CommentId `
+                    -ContentTypeId $comment.CommentContentTypeId `
+                    -Like `
+                    -Username $Username `
+                    -Credential $Credential
+            }
         }
         Write-Progress 'Sample Data' "Creating Comments" -Completed -Id 805
     }

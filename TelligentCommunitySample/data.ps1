@@ -25,7 +25,7 @@ function Test-Probability {
 function Get-RandomBiasedCommentCount
 {
     param(
-        [int]$LowerMax = 5,
+        [int]$LowerMax = 10,
         [int]$Max = 20
         )
 

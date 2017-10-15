@@ -3,6 +3,7 @@
 function New-CommunitySampleGroup {
 	[CmdletBinding()]
     param(
+        [string]$Name = (Get-RandomApplicationName),
         [int]$ParentGroupId = 0,
         [int]$Forum = (Get-Random -Maximum 3),
         [int]$Blog = (Get-Random -Maximum 3),
@@ -27,7 +28,7 @@ function New-CommunitySampleGroup {
         $group = New-CommunityGroup @groupSplat `
             -GroupType $GroupType `
             -Description (Get-RandomTitle) `
-            -Name (Get-RandomApplicationName) `
+            -Name $Name `
             -EnableGroupMessages $true `
             -AutoCreateApplications $false `
             -Credential $Credential
@@ -100,6 +101,7 @@ function New-CommunitySampleForum {
             -GroupId $GroupId `
             -Name "$(Get-RandomApplicationName) Forum" `
             -Description (Get-RandomTitle) `
+            -AllowedThreadTypes QuestionAndAnswer `
             -Credential $Credential
     }
 }
