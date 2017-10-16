@@ -6,6 +6,14 @@ These scripts work with Telligent Community 7.6+, although they use REST and so 
 
 The current weightings of how we decide how much data to generate is based around generating sample data for test purposes (e.g. 50% of content that supports ratings will have 1 or more ratings).  Although some of the building blocks behind these scripts could be reused to generate more realistic data.  (e.g. if you wnt to create 1000 forum threads, you can just use the Initialize-CommunitySampleForum command with a ThreadCount of 1000.
 
+## Installation
+
+The sample data generation scripts are published to the PowerShell gallery and can be installed by running the following command at the PowerShell prompt.
+
+```powershell
+PS> Install-Module -Name TelligentCommunitySample
+```
+
 ## Credentials
 
 The most important command is the New-CommunityCredential command.  This contains the details for accessing your community, that is required by all the sample data generation functions
