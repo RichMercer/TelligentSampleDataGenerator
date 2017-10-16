@@ -37,7 +37,7 @@ Initialize-CommunitySampleGroup -GroupId 3 -Credential $cred
 Create 1000 threads within a specific forum
 ```powershell
 $cred = ncc http://mycommunity.local/ admin abc123
-Initialize-CommunitySampleForum -ForumId 265 -ThreadCount 1000 -Credential $cred }
+Initialize-CommunitySampleForum -ForumId 265 -ThreadCount 1000 -Credential $cred
 ```
 
 Create 5 empty wikis in a specific group
