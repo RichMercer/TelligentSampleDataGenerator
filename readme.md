@@ -21,10 +21,6 @@ The most important command is the New-CommunityCredential command.  This contain
 ```powershell
 $cred = New-CommunityCredential -CommunityRoot http://community.com/ -Username username –ApiKey apiKey
 ```
-There is also an alias of ncc so a shorter way of creating this command is
-```powershell
-$cred = ncc http://community.com/ admin abc123
-```
 
 If using windows auth, you can specify HTTP Credentials to be used on the request
 
