@@ -64,7 +64,7 @@ Get-CommunityGroup -IncludeAllSubGroups $true -Credential $cred |% {
 
 ## Architecture
 
-### CommuniytRest
+### CommunitytRest
 
 The Community Rest module is an API to interact with the community REST API.  It is mostly code generated.
 
