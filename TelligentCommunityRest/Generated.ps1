@@ -624,7 +624,6 @@ function Get-CommunityActivitymessage {
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$Username,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-			[Parameter(ParameterSetName='ShowByMessageId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$Include,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[DateTime]$StartDate,
@@ -644,8 +643,6 @@ function Get-CommunityActivitymessage {
 		[string[]]$ExcludeActivityTypes,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$PageSize,
-		[Parameter(ParameterSetName='ShowByMessageId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[string]$MessageId,
 
 		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 		[ValidateNotNullOrEmpty()]
@@ -702,194 +699,12 @@ function Get-CommunityActivitymessage {
 		if($PSBoundParameters.ContainsKey('PageSize')) {
 			$restParams['PageSize'] = $PageSize
 		}
-			
-		if($PSBoundParameters.ContainsKey('MessageId')) {
-			$restParams['MessageId'] = $MessageId
-		}
 	
 		switch($PSCmdlet.ParameterSetName){
 			'List1' {
 				$endpoint= "api.ashx/v2/activities.json"
 				$method = 'GET'
 				$pageable = $False
-			}
-			'ShowByMessageId' {
-				$endpoint= "api.ashx/v2/activities/${messageid}.json"
-				$method = 'GET'
-				$pageable = $False
-				$restParams.Remove('messageid')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function New-CommunityActivitymessage {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='CreateByUserIdMessageBodyMessageTypeMessageSubject', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-			[Parameter(ParameterSetName='CreateByUsernameMessageBodyMessageTypeMessageSubject', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[int]$UserId,
-		[Parameter(ParameterSetName='CreateByUsernameMessageBodyMessageTypeMessageSubject', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-			[Parameter(ParameterSetName='CreateByUserIdMessageBodyMessageTypeMessageSubject', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[string]$Username,
-		[Parameter(ParameterSetName='CreateByUserIdMessageBodyMessageTypeMessageSubject', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-			[Parameter(ParameterSetName='CreateByUsernameMessageBodyMessageTypeMessageSubject', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[string]$MessageBody,
-		[Parameter(ParameterSetName='CreateByUserIdMessageBodyMessageTypeMessageSubject', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-			[Parameter(ParameterSetName='CreateByUsernameMessageBodyMessageTypeMessageSubject', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[string]$MessageType,
-		[Parameter(ParameterSetName='CreateByUserIdMessageBodyMessageTypeMessageSubject', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-			[Parameter(ParameterSetName='CreateByUsernameMessageBodyMessageTypeMessageSubject', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[string]$MessageSubject,
-		[Parameter(ParameterSetName='CreateByUserIdMessageBodyMessageTypeMessageSubject', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-			[Parameter(ParameterSetName='CreateByUsernameMessageBodyMessageTypeMessageSubject', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[string]$ContentId,
-		[Parameter(ParameterSetName='CreateByUserIdMessageBodyMessageTypeMessageSubject', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-			[Parameter(ParameterSetName='CreateByUsernameMessageBodyMessageTypeMessageSubject', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[DateTime]$DateCreated,
-		[Parameter(ParameterSetName='CreateByUserIdMessageBodyMessageTypeMessageSubject', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-			[Parameter(ParameterSetName='CreateByUsernameMessageBodyMessageTypeMessageSubject', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[int]$GroupId,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('UserId')) {
-			$restParams['UserId'] = $UserId
-		}
-			
-		if($PSBoundParameters.ContainsKey('Username')) {
-			$restParams['Username'] = $Username
-		}
-			
-		if($PSBoundParameters.ContainsKey('MessageBody')) {
-			$restParams['MessageBody'] = $MessageBody
-		}
-			
-		if($PSBoundParameters.ContainsKey('MessageType')) {
-			$restParams['MessageType'] = $MessageType
-		}
-			
-		if($PSBoundParameters.ContainsKey('MessageSubject')) {
-			$restParams['MessageSubject'] = $MessageSubject
-		}
-			
-		if($PSBoundParameters.ContainsKey('ContentId')) {
-			$restParams['ContentId'] = $ContentId
-		}
-			
-		if($PSBoundParameters.ContainsKey('DateCreated')) {
-			$restParams['DateCreated'] = $DateCreated
-		}
-			
-		if($PSBoundParameters.ContainsKey('GroupId')) {
-			$restParams['GroupId'] = $GroupId
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'CreateByUserIdMessageBodyMessageTypeMessageSubject' {
-				$endpoint= "api.ashx/v2/users/${userid}/activities.json"
-				$method = 'POST'
-				$pageable = $False
-				$restParams.Remove('userid')
-			}
-			'CreateByUsernameMessageBodyMessageTypeMessageSubject' {
-				$endpoint= "api.ashx/v2/users/${username}/activities.json"
-				$method = 'POST'
-				$pageable = $False
-				$restParams.Remove('username')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function Remove-CommunityActivitymessage {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='DeleteByMessageId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[string]$MessageId,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('MessageId')) {
-			$restParams['MessageId'] = $MessageId
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'DeleteByMessageId' {
-				$endpoint= "api.ashx/v2/activities/${messageid}.json"
-				$method = 'DELETE'
-				$pageable = $False
-				$restParams.Remove('messageid')
 			}
 		}
 
@@ -1241,6 +1056,8 @@ function Get-CommunityAggregatetaggedcontent {
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid[]]$ContainerIds,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$IncludeSubContainers,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid[]]$ApplicationIds,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid[]]$ApplicationTypeIds,
@@ -1250,6 +1067,10 @@ function Get-CommunityAggregatetaggedcontent {
 		[string[]]$Tags,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$TypeId,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[DateTime]$ContentCreatedAfterDate,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[DateTime]$ContentCreatedBeforeDate,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$SortBy,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
@@ -1273,6 +1094,10 @@ function Get-CommunityAggregatetaggedcontent {
 			$restParams['ContainerIds'] = $ContainerIds
 		}
 			
+		if($PSBoundParameters.ContainsKey('IncludeSubContainers')) {
+			$restParams['IncludeSubContainers'] = $IncludeSubContainers
+		}
+			
 		if($PSBoundParameters.ContainsKey('ApplicationIds')) {
 			$restParams['ApplicationIds'] = $ApplicationIds
 		}
@@ -1291,6 +1116,14 @@ function Get-CommunityAggregatetaggedcontent {
 			
 		if($PSBoundParameters.ContainsKey('TypeId')) {
 			$restParams['TypeId'] = $TypeId
+		}
+			
+		if($PSBoundParameters.ContainsKey('ContentCreatedAfterDate')) {
+			$restParams['ContentCreatedAfterDate'] = $ContentCreatedAfterDate
+		}
+			
+		if($PSBoundParameters.ContainsKey('ContentCreatedBeforeDate')) {
+			$restParams['ContentCreatedBeforeDate'] = $ContentCreatedBeforeDate
 		}
 			
 		if($PSBoundParameters.ContainsKey('SortBy')) {
@@ -1318,87 +1151,6 @@ function Get-CommunityAggregatetaggedcontent {
 				$endpoint= "api.ashx/v2/aggregatetaggedcontent.json"
 				$method = 'GET'
 				$pageable = $True
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function Set-CommunityAggregatetag {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='UpdateByTagNameNewTagName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[Guid]$ApplicationId,
-		[Parameter(ParameterSetName='UpdateByTagNameNewTagName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[Guid]$ApplicationTypeId,
-		[Parameter(ParameterSetName='UpdateByTagNameNewTagName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[Guid]$TypeId,
-		[Parameter(ParameterSetName='UpdateByTagNameNewTagName', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[string]$TagName,
-		[Parameter(ParameterSetName='UpdateByTagNameNewTagName', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[string]$NewTagName,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('ApplicationId')) {
-			$restParams['ApplicationId'] = $ApplicationId
-		}
-			
-		if($PSBoundParameters.ContainsKey('ApplicationTypeId')) {
-			$restParams['ApplicationTypeId'] = $ApplicationTypeId
-		}
-			
-		if($PSBoundParameters.ContainsKey('TypeId')) {
-			$restParams['TypeId'] = $TypeId
-		}
-			
-		if($PSBoundParameters.ContainsKey('TagName')) {
-			$restParams['TagName'] = $TagName
-		}
-			
-		if($PSBoundParameters.ContainsKey('NewTagName')) {
-			$restParams['NewTagName'] = $NewTagName
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'UpdateByTagNameNewTagName' {
-				$endpoint= "api.ashx/v2/aggregatetags.json"
-				$method = 'PUT'
-				$pageable = $False
 			}
 		}
 
@@ -1514,6 +1266,8 @@ function Get-CommunityAggregatetag {
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$ContainerId,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$IncludeSubContainers,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$ApplicationId,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$ApplicationTypeId,
@@ -1525,6 +1279,8 @@ function Get-CommunityAggregatetag {
 		[Guid]$TypeId,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$SortBy,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$TagNameFilter,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$SortOrder,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
@@ -1546,6 +1302,10 @@ function Get-CommunityAggregatetag {
 			
 		if($PSBoundParameters.ContainsKey('ContainerId')) {
 			$restParams['ContainerId'] = $ContainerId
+		}
+			
+		if($PSBoundParameters.ContainsKey('IncludeSubContainers')) {
+			$restParams['IncludeSubContainers'] = $IncludeSubContainers
 		}
 			
 		if($PSBoundParameters.ContainsKey('ApplicationId')) {
@@ -1570,6 +1330,10 @@ function Get-CommunityAggregatetag {
 			
 		if($PSBoundParameters.ContainsKey('SortBy')) {
 			$restParams['SortBy'] = $SortBy
+		}
+			
+		if($PSBoundParameters.ContainsKey('TagNameFilter')) {
+			$restParams['TagNameFilter'] = $TagNameFilter
 		}
 			
 		if($PSBoundParameters.ContainsKey('SortOrder')) {
@@ -1597,374 +1361,6 @@ function Get-CommunityAggregatetag {
 				$endpoint= "api.ashx/v2/aggregatetags.json"
 				$method = 'GET'
 				$pageable = $True
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function Get-CommunityBlogcomment {
-	[CmdletBinding(SupportsShouldProcess = $true, SupportsPaging = $true)] 
-	param(
-		[Parameter(ParameterSetName='ShowByIdBlogIdBlogPostId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$Id,
-		[Parameter(ParameterSetName='ShowByIdBlogIdBlogPostId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-			[Parameter(ParameterSetName='ListByBlogIdBlogPostId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$BlogId,
-		[Parameter(ParameterSetName='ShowByIdBlogIdBlogPostId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-			[Parameter(ParameterSetName='ListByBlogIdBlogPostId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$BlogPostId,
-		[Parameter(ParameterSetName='ListByBlogIdBlogPostId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[bool]$IncludeUnpublished,
-		[Parameter(ParameterSetName='ListByBlogIdBlogPostId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[string]$SortBy,
-		[Parameter(ParameterSetName='ListByBlogIdBlogPostId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[string]$SortOrder,
-		[Parameter(ParameterSetName='ListByBlogIdBlogPostId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[int]$PageSize,
-		[Parameter(ParameterSetName='ListByBlogIdBlogPostId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[int]$PageIndex,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('Id')) {
-			$restParams['Id'] = $Id
-		}
-			
-		if($PSBoundParameters.ContainsKey('BlogId')) {
-			$restParams['BlogId'] = $BlogId
-		}
-			
-		if($PSBoundParameters.ContainsKey('BlogPostId')) {
-			$restParams['BlogPostId'] = $BlogPostId
-		}
-			
-		if($PSBoundParameters.ContainsKey('IncludeUnpublished')) {
-			$restParams['IncludeUnpublished'] = $IncludeUnpublished
-		}
-			
-		if($PSBoundParameters.ContainsKey('SortBy')) {
-			$restParams['SortBy'] = $SortBy
-		}
-			
-		if($PSBoundParameters.ContainsKey('SortOrder')) {
-			$restParams['SortOrder'] = $SortOrder
-		}
-			
-		if($PSBoundParameters.ContainsKey('PageSize')) {
-			$restParams['PageSize'] = $PageSize
-		}
-			
-		if($PSBoundParameters.ContainsKey('PageIndex')) {
-			$restParams['PageIndex'] = $PageIndex
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'ShowByIdBlogIdBlogPostId' {
-				$endpoint= "api.ashx/v2/blogs/${blogid}/posts/${blogpostid}/comments/${id}.json"
-				$method = 'GET'
-				$pageable = $False
-				$restParams.Remove('blogid')
-				$restParams.Remove('blogpostid')
-				$restParams.Remove('id')
-			}
-			'ListByBlogIdBlogPostId' {
-				$endpoint= "api.ashx/v2/blogs/${blogid}/posts/${blogpostid}/comments.json"
-				$method = 'GET'
-				$pageable = $True
-				$restParams.Remove('blogid')
-				$restParams.Remove('blogpostid')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function New-CommunityBlogcomment {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='CreateByBlogIdBlogPostIdBody', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$BlogId,
-		[Parameter(ParameterSetName='CreateByBlogIdBlogPostIdBody', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$BlogPostId,
-		[Parameter(ParameterSetName='CreateByBlogIdBlogPostIdBody', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[string]$Body,
-		[Parameter(ParameterSetName='CreateByBlogIdBlogPostIdBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[DateTime]$PublishedDate,
-		[Parameter(ParameterSetName='CreateByBlogIdBlogPostIdBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[bool]$IsApproved,
-		[Parameter(ParameterSetName='CreateByBlogIdBlogPostIdBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[hashtable]$ExtendedAttributes,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('BlogId')) {
-			$restParams['BlogId'] = $BlogId
-		}
-			
-		if($PSBoundParameters.ContainsKey('BlogPostId')) {
-			$restParams['BlogPostId'] = $BlogPostId
-		}
-			
-		if($PSBoundParameters.ContainsKey('Body')) {
-			$restParams['Body'] = $Body
-		}
-			
-		if($PSBoundParameters.ContainsKey('PublishedDate')) {
-			$restParams['PublishedDate'] = $PublishedDate
-		}
-			
-		if($PSBoundParameters.ContainsKey('IsApproved')) {
-			$restParams['IsApproved'] = $IsApproved
-		}
-			
-		if($PSBoundParameters.ContainsKey('ExtendedAttributes')) {
-			$restParams['ExtendedAttributes'] = $ExtendedAttributes
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'CreateByBlogIdBlogPostIdBody' {
-				$endpoint= "api.ashx/v2/blogs/${blogid}/posts/${blogpostid}/comments.json"
-				$method = 'POST'
-				$pageable = $False
-				$restParams.Remove('blogid')
-				$restParams.Remove('blogpostid')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function Set-CommunityBlogcomment {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='UpdateByBlogIdBlogPostIdId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$BlogId,
-		[Parameter(ParameterSetName='UpdateByBlogIdBlogPostIdId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$BlogPostId,
-		[Parameter(ParameterSetName='UpdateByBlogIdBlogPostIdId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$Id,
-		[Parameter(ParameterSetName='UpdateByBlogIdBlogPostIdId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[string]$Body,
-		[Parameter(ParameterSetName='UpdateByBlogIdBlogPostIdId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[DateTime]$PublishedDate,
-		[Parameter(ParameterSetName='UpdateByBlogIdBlogPostIdId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[bool]$IsApproved,
-		[Parameter(ParameterSetName='UpdateByBlogIdBlogPostIdId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[hashtable]$ExtendedAttributes,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('BlogId')) {
-			$restParams['BlogId'] = $BlogId
-		}
-			
-		if($PSBoundParameters.ContainsKey('BlogPostId')) {
-			$restParams['BlogPostId'] = $BlogPostId
-		}
-			
-		if($PSBoundParameters.ContainsKey('Id')) {
-			$restParams['Id'] = $Id
-		}
-			
-		if($PSBoundParameters.ContainsKey('Body')) {
-			$restParams['Body'] = $Body
-		}
-			
-		if($PSBoundParameters.ContainsKey('PublishedDate')) {
-			$restParams['PublishedDate'] = $PublishedDate
-		}
-			
-		if($PSBoundParameters.ContainsKey('IsApproved')) {
-			$restParams['IsApproved'] = $IsApproved
-		}
-			
-		if($PSBoundParameters.ContainsKey('ExtendedAttributes')) {
-			$restParams['ExtendedAttributes'] = $ExtendedAttributes
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'UpdateByBlogIdBlogPostIdId' {
-				$endpoint= "api.ashx/v2/blogs/${blogid}/posts/${blogpostid}/comments/${id}.json"
-				$method = 'PUT'
-				$pageable = $False
-				$restParams.Remove('blogid')
-				$restParams.Remove('blogpostid')
-				$restParams.Remove('id')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function Remove-CommunityBlogcomment {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='DeleteByIdBlogIdBlogPostId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$Id,
-		[Parameter(ParameterSetName='DeleteByIdBlogIdBlogPostId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$BlogId,
-		[Parameter(ParameterSetName='DeleteByIdBlogIdBlogPostId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$BlogPostId,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('Id')) {
-			$restParams['Id'] = $Id
-		}
-			
-		if($PSBoundParameters.ContainsKey('BlogId')) {
-			$restParams['BlogId'] = $BlogId
-		}
-			
-		if($PSBoundParameters.ContainsKey('BlogPostId')) {
-			$restParams['BlogPostId'] = $BlogPostId
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'DeleteByIdBlogIdBlogPostId' {
-				$endpoint= "api.ashx/v2/blogs/${blogid}/posts/${blogpostid}/comments/${id}.json"
-				$method = 'DELETE'
-				$pageable = $False
-				$restParams.Remove('blogid')
-				$restParams.Remove('blogpostid')
-				$restParams.Remove('id')
 			}
 		}
 
@@ -2177,180 +1573,6 @@ function New-CommunityBlogcontactrequest {
 	}
 }
 
-function Get-CommunityBlogfavorite {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='ShowByBlogId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$BlogId,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('BlogId')) {
-			$restParams['BlogId'] = $BlogId
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'ShowByBlogId' {
-				$endpoint= "api.ashx/v2/blogs/${blogid}/favorites.json"
-				$method = 'GET'
-				$pageable = $False
-				$restParams.Remove('blogid')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function Remove-CommunityBlogfavorite {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='DeleteByBlogId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$BlogId,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('BlogId')) {
-			$restParams['BlogId'] = $BlogId
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'DeleteByBlogId' {
-				$endpoint= "api.ashx/v2/blogs/${blogid}/favorites.json"
-				$method = 'DELETE'
-				$pageable = $False
-				$restParams.Remove('blogid')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function New-CommunityBlogfavorite {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='CreateByBlogId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$BlogId,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('BlogId')) {
-			$restParams['BlogId'] = $BlogId
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'CreateByBlogId' {
-				$endpoint= "api.ashx/v2/blogs/${blogid}/favorites.json"
-				$method = 'POST'
-				$pageable = $False
-				$restParams.Remove('blogid')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
 function Get-CommunityBlogpost {
 	[CmdletBinding(SupportsShouldProcess = $true, SupportsPaging = $true)] 
 	param(
@@ -2369,11 +1591,15 @@ function Get-CommunityBlogpost {
 			[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$PostTarget,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[int]$AuthorId,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int[]]$BlogIds,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$GroupId,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[bool]$IncludeSubGroups,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$ContentIds,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[bool]$IncludeUnpublished,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
@@ -2417,6 +1643,10 @@ function Get-CommunityBlogpost {
 			$restParams['PostTarget'] = $PostTarget
 		}
 			
+		if($PSBoundParameters.ContainsKey('AuthorId')) {
+			$restParams['AuthorId'] = $AuthorId
+		}
+			
 		if($PSBoundParameters.ContainsKey('BlogIds')) {
 			$restParams['BlogIds'] = $BlogIds
 		}
@@ -2427,6 +1657,10 @@ function Get-CommunityBlogpost {
 			
 		if($PSBoundParameters.ContainsKey('IncludeSubGroups')) {
 			$restParams['IncludeSubGroups'] = $IncludeSubGroups
+		}
+			
+		if($PSBoundParameters.ContainsKey('ContentIds')) {
+			$restParams['ContentIds'] = $ContentIds
 		}
 			
 		if($PSBoundParameters.ContainsKey('IncludeUnpublished')) {
@@ -2560,6 +1794,8 @@ function New-CommunityBlogpost {
 		[Parameter(ParameterSetName='CreateByBlogIdTitleBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[bool]$IsFeatured,
 		[Parameter(ParameterSetName='CreateByBlogIdTitleBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$IsCrossPostingEnabled,
+		[Parameter(ParameterSetName='CreateByBlogIdTitleBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$FeaturedImage,
 		[Parameter(ParameterSetName='CreateByBlogIdTitleBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string[]]$Tags,
@@ -2575,6 +1811,28 @@ function New-CommunityBlogpost {
 		[string]$FileUploadContext,
 		[Parameter(ParameterSetName='CreateByBlogIdTitleBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[hashtable]$ExtendedAttributes,
+		[Parameter(ParameterSetName='CreateByBlogIdTitleBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$PostImageUrl,
+		[Parameter(ParameterSetName='CreateByBlogIdTitleBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$PostImageFileName,
+		[Parameter(ParameterSetName='CreateByBlogIdTitleBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[byte[]]$PostImageFileData,
+		[Parameter(ParameterSetName='CreateByBlogIdTitleBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$PostImageFileUploadContext,
+		[Parameter(ParameterSetName='CreateByBlogIdTitleBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$OpenGraphTitle,
+		[Parameter(ParameterSetName='CreateByBlogIdTitleBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$OpenGraphDescription,
+		[Parameter(ParameterSetName='CreateByBlogIdTitleBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$OpenGraphImageContext,
+		[Parameter(ParameterSetName='CreateByBlogIdTitleBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$OpenGraphImageFileName,
+		[Parameter(ParameterSetName='CreateByBlogIdTitleBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$MetaTitle,
+		[Parameter(ParameterSetName='CreateByBlogIdTitleBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$MetaKeywords,
+		[Parameter(ParameterSetName='CreateByBlogIdTitleBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$MetaDescription,
 
 		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 		[ValidateNotNullOrEmpty()]
@@ -2628,6 +1886,10 @@ function New-CommunityBlogpost {
 			$restParams['IsFeatured'] = $IsFeatured
 		}
 			
+		if($PSBoundParameters.ContainsKey('IsCrossPostingEnabled')) {
+			$restParams['IsCrossPostingEnabled'] = $IsCrossPostingEnabled
+		}
+			
 		if($PSBoundParameters.ContainsKey('FeaturedImage')) {
 			$restParams['FeaturedImage'] = $FeaturedImage
 		}
@@ -2658,6 +1920,50 @@ function New-CommunityBlogpost {
 			
 		if($PSBoundParameters.ContainsKey('ExtendedAttributes')) {
 			$restParams['ExtendedAttributes'] = $ExtendedAttributes
+		}
+			
+		if($PSBoundParameters.ContainsKey('PostImageUrl')) {
+			$restParams['PostImageUrl'] = $PostImageUrl
+		}
+			
+		if($PSBoundParameters.ContainsKey('PostImageFileName')) {
+			$restParams['PostImageFileName'] = $PostImageFileName
+		}
+			
+		if($PSBoundParameters.ContainsKey('PostImageFileData')) {
+			$restParams['PostImageFileData'] = $PostImageFileData
+		}
+			
+		if($PSBoundParameters.ContainsKey('PostImageFileUploadContext')) {
+			$restParams['PostImageFileUploadContext'] = $PostImageFileUploadContext
+		}
+			
+		if($PSBoundParameters.ContainsKey('OpenGraphTitle')) {
+			$restParams['OpenGraphTitle'] = $OpenGraphTitle
+		}
+			
+		if($PSBoundParameters.ContainsKey('OpenGraphDescription')) {
+			$restParams['OpenGraphDescription'] = $OpenGraphDescription
+		}
+			
+		if($PSBoundParameters.ContainsKey('OpenGraphImageContext')) {
+			$restParams['OpenGraphImageContext'] = $OpenGraphImageContext
+		}
+			
+		if($PSBoundParameters.ContainsKey('OpenGraphImageFileName')) {
+			$restParams['OpenGraphImageFileName'] = $OpenGraphImageFileName
+		}
+			
+		if($PSBoundParameters.ContainsKey('MetaTitle')) {
+			$restParams['MetaTitle'] = $MetaTitle
+		}
+			
+		if($PSBoundParameters.ContainsKey('MetaKeywords')) {
+			$restParams['MetaKeywords'] = $MetaKeywords
+		}
+			
+		if($PSBoundParameters.ContainsKey('MetaDescription')) {
+			$restParams['MetaDescription'] = $MetaDescription
 		}
 	
 		switch($PSCmdlet.ParameterSetName){
@@ -2728,6 +2034,8 @@ function Set-CommunityBlogpost {
 		[Parameter(ParameterSetName='UpdateByIdBlogId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[bool]$IsFeatured,
 		[Parameter(ParameterSetName='UpdateByIdBlogId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$IsCrossPostingEnabled,
+		[Parameter(ParameterSetName='UpdateByIdBlogId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$FeaturedImage,
 		[Parameter(ParameterSetName='UpdateByIdBlogId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$ContentType,
@@ -2745,6 +2053,32 @@ function Set-CommunityBlogpost {
 		[string[]]$Tags,
 		[Parameter(ParameterSetName='UpdateByIdBlogId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[hashtable]$ExtendedAttributes,
+		[Parameter(ParameterSetName='UpdateByIdBlogId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$PostImageUrl,
+		[Parameter(ParameterSetName='UpdateByIdBlogId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$PostImageFileName,
+		[Parameter(ParameterSetName='UpdateByIdBlogId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[byte[]]$PostImageFileData,
+		[Parameter(ParameterSetName='UpdateByIdBlogId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$PostImageFileUploadContext,
+		[Parameter(ParameterSetName='UpdateByIdBlogId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$RemovePostImage,
+		[Parameter(ParameterSetName='UpdateByIdBlogId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$OpenGraphTitle,
+		[Parameter(ParameterSetName='UpdateByIdBlogId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$OpenGraphDescription,
+		[Parameter(ParameterSetName='UpdateByIdBlogId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$OpenGraphImageContext,
+		[Parameter(ParameterSetName='UpdateByIdBlogId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$OpenGraphImageFileName,
+		[Parameter(ParameterSetName='UpdateByIdBlogId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$RemoveOpenGraphImage,
+		[Parameter(ParameterSetName='UpdateByIdBlogId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$MetaTitle,
+		[Parameter(ParameterSetName='UpdateByIdBlogId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$MetaKeywords,
+		[Parameter(ParameterSetName='UpdateByIdBlogId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$MetaDescription,
 
 		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 		[ValidateNotNullOrEmpty()]
@@ -2802,6 +2136,10 @@ function Set-CommunityBlogpost {
 			$restParams['IsFeatured'] = $IsFeatured
 		}
 			
+		if($PSBoundParameters.ContainsKey('IsCrossPostingEnabled')) {
+			$restParams['IsCrossPostingEnabled'] = $IsCrossPostingEnabled
+		}
+			
 		if($PSBoundParameters.ContainsKey('FeaturedImage')) {
 			$restParams['FeaturedImage'] = $FeaturedImage
 		}
@@ -2836,6 +2174,58 @@ function Set-CommunityBlogpost {
 			
 		if($PSBoundParameters.ContainsKey('ExtendedAttributes')) {
 			$restParams['ExtendedAttributes'] = $ExtendedAttributes
+		}
+			
+		if($PSBoundParameters.ContainsKey('PostImageUrl')) {
+			$restParams['PostImageUrl'] = $PostImageUrl
+		}
+			
+		if($PSBoundParameters.ContainsKey('PostImageFileName')) {
+			$restParams['PostImageFileName'] = $PostImageFileName
+		}
+			
+		if($PSBoundParameters.ContainsKey('PostImageFileData')) {
+			$restParams['PostImageFileData'] = $PostImageFileData
+		}
+			
+		if($PSBoundParameters.ContainsKey('PostImageFileUploadContext')) {
+			$restParams['PostImageFileUploadContext'] = $PostImageFileUploadContext
+		}
+			
+		if($PSBoundParameters.ContainsKey('RemovePostImage')) {
+			$restParams['RemovePostImage'] = $RemovePostImage
+		}
+			
+		if($PSBoundParameters.ContainsKey('OpenGraphTitle')) {
+			$restParams['OpenGraphTitle'] = $OpenGraphTitle
+		}
+			
+		if($PSBoundParameters.ContainsKey('OpenGraphDescription')) {
+			$restParams['OpenGraphDescription'] = $OpenGraphDescription
+		}
+			
+		if($PSBoundParameters.ContainsKey('OpenGraphImageContext')) {
+			$restParams['OpenGraphImageContext'] = $OpenGraphImageContext
+		}
+			
+		if($PSBoundParameters.ContainsKey('OpenGraphImageFileName')) {
+			$restParams['OpenGraphImageFileName'] = $OpenGraphImageFileName
+		}
+			
+		if($PSBoundParameters.ContainsKey('RemoveOpenGraphImage')) {
+			$restParams['RemoveOpenGraphImage'] = $RemoveOpenGraphImage
+		}
+			
+		if($PSBoundParameters.ContainsKey('MetaTitle')) {
+			$restParams['MetaTitle'] = $MetaTitle
+		}
+			
+		if($PSBoundParameters.ContainsKey('MetaKeywords')) {
+			$restParams['MetaKeywords'] = $MetaKeywords
+		}
+			
+		if($PSBoundParameters.ContainsKey('MetaDescription')) {
+			$restParams['MetaDescription'] = $MetaDescription
 		}
 	
 		switch($PSCmdlet.ParameterSetName){
@@ -3227,9 +2617,14 @@ function Get-CommunityBlog {
 		[Parameter(ParameterSetName='ShowByKeyGroupId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='ShowById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByApplicationId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$GroupId,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[bool]$IncludeSubGroups,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[Guid[]]$ApplicationIds,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$PermissionId,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$SortBy,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
@@ -3237,14 +2632,22 @@ function Get-CommunityBlog {
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$OwnerUserId,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[int]$UserId,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$PageSize,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$PageIndex,
 		[Parameter(ParameterSetName='ShowById', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByApplicationId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='ShowByKeyGroupId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$Id,
+		[Parameter(ParameterSetName='ShowByApplicationId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByKeyGroupId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[Guid]$ApplicationId,
 		[Parameter(ParameterSetName='ShowByKeyGroupId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='ShowById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByApplicationId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$Key,
 
 		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
@@ -3263,6 +2666,14 @@ function Get-CommunityBlog {
 			$restParams['IncludeSubGroups'] = $IncludeSubGroups
 		}
 			
+		if($PSBoundParameters.ContainsKey('ApplicationIds')) {
+			$restParams['ApplicationIds'] = $ApplicationIds
+		}
+			
+		if($PSBoundParameters.ContainsKey('PermissionId')) {
+			$restParams['PermissionId'] = $PermissionId
+		}
+			
 		if($PSBoundParameters.ContainsKey('SortBy')) {
 			$restParams['SortBy'] = $SortBy
 		}
@@ -3275,6 +2686,10 @@ function Get-CommunityBlog {
 			$restParams['OwnerUserId'] = $OwnerUserId
 		}
 			
+		if($PSBoundParameters.ContainsKey('UserId')) {
+			$restParams['UserId'] = $UserId
+		}
+			
 		if($PSBoundParameters.ContainsKey('PageSize')) {
 			$restParams['PageSize'] = $PageSize
 		}
@@ -3285,6 +2700,10 @@ function Get-CommunityBlog {
 			
 		if($PSBoundParameters.ContainsKey('Id')) {
 			$restParams['Id'] = $Id
+		}
+			
+		if($PSBoundParameters.ContainsKey('ApplicationId')) {
+			$restParams['ApplicationId'] = $ApplicationId
 		}
 			
 		if($PSBoundParameters.ContainsKey('Key')) {
@@ -3302,6 +2721,12 @@ function Get-CommunityBlog {
 				$method = 'GET'
 				$pageable = $False
 				$restParams.Remove('id')
+			}
+			'ShowByApplicationId' {
+				$endpoint= "api.ashx/v2/blogs/${applicationId}.json"
+				$method = 'GET'
+				$pageable = $False
+				$restParams.Remove('applicationId')
 			}
 			'ShowByKeyGroupId' {
 				$endpoint= "api.ashx/v2/groups/${groupid}/blogs/${key}.json"
@@ -3360,6 +2785,8 @@ function New-CommunityBlog {
 		[string[]]$Authors,
 		[Parameter(ParameterSetName='CreateByGroupIdName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[hashtable]$ExtendedAttributes,
+		[Parameter(ParameterSetName='CreateByGroupIdName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$DefaultPostImageUrl,
 
 		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 		[ValidateNotNullOrEmpty()]
@@ -3395,6 +2822,10 @@ function New-CommunityBlog {
 			
 		if($PSBoundParameters.ContainsKey('ExtendedAttributes')) {
 			$restParams['ExtendedAttributes'] = $ExtendedAttributes
+		}
+			
+		if($PSBoundParameters.ContainsKey('DefaultPostImageUrl')) {
+			$restParams['DefaultPostImageUrl'] = $DefaultPostImageUrl
 		}
 	
 		switch($PSCmdlet.ParameterSetName){
@@ -3455,6 +2886,8 @@ function Set-CommunityBlog {
 		[string[]]$Authors,
 		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[hashtable]$ExtendedAttributes,
+		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$DefaultPostImageUrl,
 
 		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 		[ValidateNotNullOrEmpty()]
@@ -3494,6 +2927,10 @@ function Set-CommunityBlog {
 			
 		if($PSBoundParameters.ContainsKey('ExtendedAttributes')) {
 			$restParams['ExtendedAttributes'] = $ExtendedAttributes
+		}
+			
+		if($PSBoundParameters.ContainsKey('DefaultPostImageUrl')) {
+			$restParams['DefaultPostImageUrl'] = $DefaultPostImageUrl
 		}
 	
 		switch($PSCmdlet.ParameterSetName){
@@ -3682,6 +3119,8 @@ function Get-CommunityBookmark {
 		[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$ContainerId,
 		[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$IncludeSubContainers,
+		[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$ApplicationId,
 		[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid[]]$ContentTypeIds,
@@ -3718,6 +3157,10 @@ function Get-CommunityBookmark {
 			
 		if($PSBoundParameters.ContainsKey('ContainerId')) {
 			$restParams['ContainerId'] = $ContainerId
+		}
+			
+		if($PSBoundParameters.ContainsKey('IncludeSubContainers')) {
+			$restParams['IncludeSubContainers'] = $IncludeSubContainers
 		}
 			
 		if($PSBoundParameters.ContainsKey('ApplicationId')) {
@@ -3956,6 +3399,8 @@ function New-CommunityComment {
 		[string]$ContentUrl,
 		[Parameter(ParameterSetName='CreateByBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$ParentCommentId,
+		[Parameter(ParameterSetName='CreateByBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$Url,
 		[Parameter(ParameterSetName='CreateByBody', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 		[string]$Body,
 		[Parameter(ParameterSetName='CreateByBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
@@ -3989,6 +3434,10 @@ function New-CommunityComment {
 			
 		if($PSBoundParameters.ContainsKey('ParentCommentId')) {
 			$restParams['ParentCommentId'] = $ParentCommentId
+		}
+			
+		if($PSBoundParameters.ContainsKey('Url')) {
+			$restParams['Url'] = $Url
 		}
 			
 		if($PSBoundParameters.ContainsKey('Body')) {
@@ -4055,12 +3504,19 @@ function Get-CommunityComment {
 	param(
 		[Parameter(ParameterSetName='ShowByCommentId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$CommentId,
+		[Parameter(ParameterSetName='ShowByCommentId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$PostTarget,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$CommentIds,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$ContentId,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$ContentUrl,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$ContainerId,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$IncludeSubContainers,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$ApplicationId,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
@@ -4083,6 +3539,8 @@ function Get-CommunityComment {
 		[int]$PageSize,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$PageIndex,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[Guid]$ParentCommentId,
 
 		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 		[ValidateNotNullOrEmpty()]
@@ -4096,6 +3554,14 @@ function Get-CommunityComment {
 			$restParams['CommentId'] = $CommentId
 		}
 			
+		if($PSBoundParameters.ContainsKey('PostTarget')) {
+			$restParams['PostTarget'] = $PostTarget
+		}
+			
+		if($PSBoundParameters.ContainsKey('CommentIds')) {
+			$restParams['CommentIds'] = $CommentIds
+		}
+			
 		if($PSBoundParameters.ContainsKey('ContentId')) {
 			$restParams['ContentId'] = $ContentId
 		}
@@ -4106,6 +3572,10 @@ function Get-CommunityComment {
 			
 		if($PSBoundParameters.ContainsKey('ContainerId')) {
 			$restParams['ContainerId'] = $ContainerId
+		}
+			
+		if($PSBoundParameters.ContainsKey('IncludeSubContainers')) {
+			$restParams['IncludeSubContainers'] = $IncludeSubContainers
 		}
 			
 		if($PSBoundParameters.ContainsKey('ApplicationId')) {
@@ -4150,6 +3620,10 @@ function Get-CommunityComment {
 			
 		if($PSBoundParameters.ContainsKey('PageIndex')) {
 			$restParams['PageIndex'] = $PageIndex
+		}
+			
+		if($PSBoundParameters.ContainsKey('ParentCommentId')) {
+			$restParams['ParentCommentId'] = $ParentCommentId
 		}
 	
 		switch($PSCmdlet.ParameterSetName){
@@ -4207,6 +3681,8 @@ function Set-CommunityComment {
 		[Parameter(ParameterSetName='UpdateByCommentId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$CommentTypeId,
 		[Parameter(ParameterSetName='UpdateByCommentId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[DateTime]$CreatedDate,
+		[Parameter(ParameterSetName='UpdateByCommentId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$SortOrder,
 		[Parameter(ParameterSetName='UpdateByCommentId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[bool]$IsApproved,
@@ -4233,6 +3709,10 @@ function Set-CommunityComment {
 			
 		if($PSBoundParameters.ContainsKey('CommentTypeId')) {
 			$restParams['CommentTypeId'] = $CommentTypeId
+		}
+			
+		if($PSBoundParameters.ContainsKey('CreatedDate')) {
+			$restParams['CreatedDate'] = $CreatedDate
 		}
 			
 		if($PSBoundParameters.ContainsKey('SortOrder')) {
@@ -4368,6 +3848,11 @@ function Get-CommunityContent {
 		}
 	
 		switch($PSCmdlet.ParameterSetName){
+			'ShowByContentTypeId' {
+				$endpoint= "api.ashx/v2/content.json"
+				$method = 'GET'
+				$pageable = $False
+			}
 			'ShowByContentTypeId' {
 				$endpoint= "api.ashx/v2/content/${contenttypeid}/services.json"
 				$method = 'GET'
@@ -5132,94 +4617,6 @@ function Get-CommunityEndpoint {
 	}
 }
 
-function Get-CommunityFavorite {
-	[CmdletBinding(SupportsShouldProcess = $true, SupportsPaging = $true)] 
-	param(
-		[Parameter(ParameterSetName='ListById', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$Id,
-		[Parameter(ParameterSetName='ListById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[string]$Application,
-		[Parameter(ParameterSetName='ListById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[string]$SortBy,
-		[Parameter(ParameterSetName='ListById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[string[]]$FavoriteTypes,
-		[Parameter(ParameterSetName='ListById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[int]$PageSize,
-		[Parameter(ParameterSetName='ListById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[int]$PageIndex,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('Id')) {
-			$restParams['Id'] = $Id
-		}
-			
-		if($PSBoundParameters.ContainsKey('Application')) {
-			$restParams['Application'] = $Application
-		}
-			
-		if($PSBoundParameters.ContainsKey('SortBy')) {
-			$restParams['SortBy'] = $SortBy
-		}
-			
-		if($PSBoundParameters.ContainsKey('FavoriteTypes')) {
-			$restParams['FavoriteTypes'] = $FavoriteTypes
-		}
-			
-		if($PSBoundParameters.ContainsKey('PageSize')) {
-			$restParams['PageSize'] = $PageSize
-		}
-			
-		if($PSBoundParameters.ContainsKey('PageIndex')) {
-			$restParams['PageIndex'] = $PageIndex
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'ListById' {
-				$endpoint= "api.ashx/v2/users/${id}/favorites.json"
-				$method = 'GET'
-				$pageable = $True
-				$restParams.Remove('id')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
 function Get-CommunityFeature {
 	[CmdletBinding(SupportsShouldProcess = $true)] 
 	param(
@@ -5300,6 +4697,12 @@ function Get-CommunityFollower {
 		[string]$Username,
 		[Parameter(ParameterSetName='ListByUserId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='ListByUsername', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$SortBy,
+		[Parameter(ParameterSetName='ListByUserId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ListByUsername', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$SortOrder,
+		[Parameter(ParameterSetName='ListByUserId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ListByUsername', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$PageSize,
 		[Parameter(ParameterSetName='ListByUserId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='ListByUsername', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
@@ -5319,6 +4722,14 @@ function Get-CommunityFollower {
 			
 		if($PSBoundParameters.ContainsKey('Username')) {
 			$restParams['Username'] = $Username
+		}
+			
+		if($PSBoundParameters.ContainsKey('SortBy')) {
+			$restParams['SortBy'] = $SortBy
+		}
+			
+		if($PSBoundParameters.ContainsKey('SortOrder')) {
+			$restParams['SortOrder'] = $SortOrder
 		}
 			
 		if($PSBoundParameters.ContainsKey('PageSize')) {
@@ -5386,6 +4797,12 @@ function Get-CommunityFollowing {
 		[string]$FollowerName,
 		[Parameter(ParameterSetName='ListByFollowerId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='ListByFollowerName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$SortBy,
+		[Parameter(ParameterSetName='ListByFollowerId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ListByFollowerName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$SortOrder,
+		[Parameter(ParameterSetName='ListByFollowerId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ListByFollowerName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$PageSize,
 		[Parameter(ParameterSetName='ListByFollowerId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='ListByFollowerName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
@@ -5405,6 +4822,14 @@ function Get-CommunityFollowing {
 			
 		if($PSBoundParameters.ContainsKey('FollowerName')) {
 			$restParams['FollowerName'] = $FollowerName
+		}
+			
+		if($PSBoundParameters.ContainsKey('SortBy')) {
+			$restParams['SortBy'] = $SortBy
+		}
+			
+		if($PSBoundParameters.ContainsKey('SortOrder')) {
+			$restParams['SortOrder'] = $SortOrder
 		}
 			
 		if($PSBoundParameters.ContainsKey('PageSize')) {
@@ -5628,180 +5053,6 @@ function Remove-CommunityFollowing {
 	}
 }
 
-function Get-CommunityForumfavorite {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='ShowByForumId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$ForumId,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('ForumId')) {
-			$restParams['ForumId'] = $ForumId
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'ShowByForumId' {
-				$endpoint= "api.ashx/v2/forums/${forumid}/favorites.json"
-				$method = 'GET'
-				$pageable = $False
-				$restParams.Remove('forumid')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function Remove-CommunityForumfavorite {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='DeleteByForumId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$ForumId,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('ForumId')) {
-			$restParams['ForumId'] = $ForumId
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'DeleteByForumId' {
-				$endpoint= "api.ashx/v2/forums/${forumid}/favorites.json"
-				$method = 'DELETE'
-				$pageable = $False
-				$restParams.Remove('forumid')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function New-CommunityForumfavorite {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='CreateByForumId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$ForumId,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('ForumId')) {
-			$restParams['ForumId'] = $ForumId
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'CreateByForumId' {
-				$endpoint= "api.ashx/v2/forums/${forumid}/favorites.json"
-				$method = 'POST'
-				$pageable = $False
-				$restParams.Remove('forumid')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
 function Get-CommunityForumreply {
 	[CmdletBinding(SupportsShouldProcess = $true, SupportsPaging = $true)] 
 	param(
@@ -5820,6 +5071,8 @@ function Get-CommunityForumreply {
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[bool]$IncludeSubGroups,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$ContentIds,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$SortBy,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$SortOrder,
@@ -5827,6 +5080,8 @@ function Get-CommunityForumreply {
 		[int]$PageSize,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$PageIndex,
+		[Parameter(ParameterSetName='ShowByReplyId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[Guid]$ContentId,
 		[Parameter(ParameterSetName='ShowByReplyId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 		[int]$ReplyId,
 		[Parameter(ParameterSetName='ShowByReplyId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
@@ -5864,6 +5119,10 @@ function Get-CommunityForumreply {
 			$restParams['IncludeSubGroups'] = $IncludeSubGroups
 		}
 			
+		if($PSBoundParameters.ContainsKey('ContentIds')) {
+			$restParams['ContentIds'] = $ContentIds
+		}
+			
 		if($PSBoundParameters.ContainsKey('SortBy')) {
 			$restParams['SortBy'] = $SortBy
 		}
@@ -5878,6 +5137,10 @@ function Get-CommunityForumreply {
 			
 		if($PSBoundParameters.ContainsKey('PageIndex')) {
 			$restParams['PageIndex'] = $PageIndex
+		}
+			
+		if($PSBoundParameters.ContainsKey('ContentId')) {
+			$restParams['ContentId'] = $ContentId
 		}
 			
 		if($PSBoundParameters.ContainsKey('ReplyId')) {
@@ -5949,6 +5212,8 @@ function New-CommunityForumreply {
 		[Parameter(ParameterSetName='CreateByThreadIdBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[bool]$IsSuggestedAnswer,
 		[Parameter(ParameterSetName='CreateByThreadIdBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$IsAnswer,
+		[Parameter(ParameterSetName='CreateByThreadIdBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[bool]$SubscribeToThread,
 		[Parameter(ParameterSetName='CreateByThreadIdBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string[]]$Tags,
@@ -5997,6 +5262,10 @@ function New-CommunityForumreply {
 			
 		if($PSBoundParameters.ContainsKey('IsSuggestedAnswer')) {
 			$restParams['IsSuggestedAnswer'] = $IsSuggestedAnswer
+		}
+			
+		if($PSBoundParameters.ContainsKey('IsAnswer')) {
+			$restParams['IsAnswer'] = $IsAnswer
 		}
 			
 		if($PSBoundParameters.ContainsKey('SubscribeToThread')) {
@@ -6339,15 +5608,25 @@ function Get-CommunityForum {
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[bool]$IncludeSubGroups,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[Guid[]]$ApplicationIds,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$PermissionId,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$SortBy,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$SortOrder,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[int]$UserId,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$PageSize,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$PageIndex,
 		[Parameter(ParameterSetName='ShowById', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByApplicationId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$Id,
+		[Parameter(ParameterSetName='ShowByApplicationId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[Guid]$ApplicationId,
 
 		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 		[ValidateNotNullOrEmpty()]
@@ -6365,12 +5644,24 @@ function Get-CommunityForum {
 			$restParams['IncludeSubGroups'] = $IncludeSubGroups
 		}
 			
+		if($PSBoundParameters.ContainsKey('ApplicationIds')) {
+			$restParams['ApplicationIds'] = $ApplicationIds
+		}
+			
+		if($PSBoundParameters.ContainsKey('PermissionId')) {
+			$restParams['PermissionId'] = $PermissionId
+		}
+			
 		if($PSBoundParameters.ContainsKey('SortBy')) {
 			$restParams['SortBy'] = $SortBy
 		}
 			
 		if($PSBoundParameters.ContainsKey('SortOrder')) {
 			$restParams['SortOrder'] = $SortOrder
+		}
+			
+		if($PSBoundParameters.ContainsKey('UserId')) {
+			$restParams['UserId'] = $UserId
 		}
 			
 		if($PSBoundParameters.ContainsKey('PageSize')) {
@@ -6384,6 +5675,10 @@ function Get-CommunityForum {
 		if($PSBoundParameters.ContainsKey('Id')) {
 			$restParams['Id'] = $Id
 		}
+			
+		if($PSBoundParameters.ContainsKey('ApplicationId')) {
+			$restParams['ApplicationId'] = $ApplicationId
+		}
 	
 		switch($PSCmdlet.ParameterSetName){
 			'List1' {
@@ -6396,6 +5691,12 @@ function Get-CommunityForum {
 				$method = 'GET'
 				$pageable = $False
 				$restParams.Remove('id')
+			}
+			'ShowByApplicationId' {
+				$endpoint= "api.ashx/v2/forums/${applicationid}.json"
+				$method = 'GET'
+				$pageable = $False
+				$restParams.Remove('applicationid')
 			}
 		}
 
@@ -6448,9 +5749,9 @@ function New-CommunityForum {
 		[Parameter(ParameterSetName='CreateByGroupIdName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[bool]$IndexPosts,
 		[Parameter(ParameterSetName='CreateByGroupIdName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[bool]$ModeratePosts,
+		[string]$Key,
 		[Parameter(ParameterSetName='CreateByGroupIdName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[bool]$EnableModerationNotifications,
+		[bool]$ModeratePosts,
 		[Parameter(ParameterSetName='CreateByGroupIdName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[bool]$EnablePostStatistics,
 		[Parameter(ParameterSetName='CreateByGroupIdName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
@@ -6467,6 +5768,12 @@ function New-CommunityForum {
 		[bool]$EnablePassiveMode,
 		[Parameter(ParameterSetName='CreateByGroupIdName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$PassiveModeAddress,
+		[Parameter(ParameterSetName='CreateByGroupIdName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[int]$MappedGalleryId,
+		[Parameter(ParameterSetName='CreateByGroupIdName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[int]$SuggestedAnswerVoteThreshold,
+		[Parameter(ParameterSetName='CreateByGroupIdName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[int]$VerifiedAnswerVoteThreshold,
 		[Parameter(ParameterSetName='CreateByGroupIdName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[hashtable]$ExtendedAttributes,
 
@@ -6506,12 +5813,12 @@ function New-CommunityForum {
 			$restParams['IndexPosts'] = $IndexPosts
 		}
 			
-		if($PSBoundParameters.ContainsKey('ModeratePosts')) {
-			$restParams['ModeratePosts'] = $ModeratePosts
+		if($PSBoundParameters.ContainsKey('Key')) {
+			$restParams['Key'] = $Key
 		}
 			
-		if($PSBoundParameters.ContainsKey('EnableModerationNotifications')) {
-			$restParams['EnableModerationNotifications'] = $EnableModerationNotifications
+		if($PSBoundParameters.ContainsKey('ModeratePosts')) {
+			$restParams['ModeratePosts'] = $ModeratePosts
 		}
 			
 		if($PSBoundParameters.ContainsKey('EnablePostStatistics')) {
@@ -6544,6 +5851,18 @@ function New-CommunityForum {
 			
 		if($PSBoundParameters.ContainsKey('PassiveModeAddress')) {
 			$restParams['PassiveModeAddress'] = $PassiveModeAddress
+		}
+			
+		if($PSBoundParameters.ContainsKey('MappedGalleryId')) {
+			$restParams['MappedGalleryId'] = $MappedGalleryId
+		}
+			
+		if($PSBoundParameters.ContainsKey('SuggestedAnswerVoteThreshold')) {
+			$restParams['SuggestedAnswerVoteThreshold'] = $SuggestedAnswerVoteThreshold
+		}
+			
+		if($PSBoundParameters.ContainsKey('VerifiedAnswerVoteThreshold')) {
+			$restParams['VerifiedAnswerVoteThreshold'] = $VerifiedAnswerVoteThreshold
 		}
 			
 		if($PSBoundParameters.ContainsKey('ExtendedAttributes')) {
@@ -6609,9 +5928,9 @@ function Set-CommunityForum {
 		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[bool]$IndexPosts,
 		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[bool]$ModeratePosts,
+		[string]$Key,
 		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[bool]$EnableModerationNotifications,
+		[bool]$ModeratePosts,
 		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[bool]$EnablePostStatistics,
 		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
@@ -6628,6 +5947,12 @@ function Set-CommunityForum {
 		[bool]$EnablePassiveMode,
 		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$PassiveModeAddress,
+		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[int]$MappedGalleryId,
+		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[int]$SuggestedAnswerVoteThreshold,
+		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[int]$VerifiedAnswerVoteThreshold,
 		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[hashtable]$ExtendedAttributes,
 
@@ -6671,12 +5996,12 @@ function Set-CommunityForum {
 			$restParams['IndexPosts'] = $IndexPosts
 		}
 			
-		if($PSBoundParameters.ContainsKey('ModeratePosts')) {
-			$restParams['ModeratePosts'] = $ModeratePosts
+		if($PSBoundParameters.ContainsKey('Key')) {
+			$restParams['Key'] = $Key
 		}
 			
-		if($PSBoundParameters.ContainsKey('EnableModerationNotifications')) {
-			$restParams['EnableModerationNotifications'] = $EnableModerationNotifications
+		if($PSBoundParameters.ContainsKey('ModeratePosts')) {
+			$restParams['ModeratePosts'] = $ModeratePosts
 		}
 			
 		if($PSBoundParameters.ContainsKey('EnablePostStatistics')) {
@@ -6709,6 +6034,18 @@ function Set-CommunityForum {
 			
 		if($PSBoundParameters.ContainsKey('PassiveModeAddress')) {
 			$restParams['PassiveModeAddress'] = $PassiveModeAddress
+		}
+			
+		if($PSBoundParameters.ContainsKey('MappedGalleryId')) {
+			$restParams['MappedGalleryId'] = $MappedGalleryId
+		}
+			
+		if($PSBoundParameters.ContainsKey('SuggestedAnswerVoteThreshold')) {
+			$restParams['SuggestedAnswerVoteThreshold'] = $SuggestedAnswerVoteThreshold
+		}
+			
+		if($PSBoundParameters.ContainsKey('VerifiedAnswerVoteThreshold')) {
+			$restParams['VerifiedAnswerVoteThreshold'] = $VerifiedAnswerVoteThreshold
 		}
 			
 		if($PSBoundParameters.ContainsKey('ExtendedAttributes')) {
@@ -6824,6 +6161,7 @@ function Get-CommunityForumthread {
 			[Parameter(ParameterSetName='List6', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='List7', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='ShowByThreadId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByContentId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$ForumId,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
@@ -6833,6 +6171,22 @@ function Get-CommunityForumthread {
 			[Parameter(ParameterSetName='List6', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='List7', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$GroupId,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List3', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List4', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List5', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List6', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List7', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$ContentIds,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List3', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List4', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List5', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List6', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List7', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[int]$AuthorId,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='List3', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
@@ -6896,6 +6250,22 @@ function Get-CommunityForumthread {
 			[Parameter(ParameterSetName='List5', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='List6', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='List7', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[DateTime]$CreatedAfterDate,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List3', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List4', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List5', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List6', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List7', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[DateTime]$CreatedBeforeDate,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List3', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List4', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List5', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List6', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='List7', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$PageSize,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
@@ -6906,10 +6276,16 @@ function Get-CommunityForumthread {
 			[Parameter(ParameterSetName='List7', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$PageIndex,
 		[Parameter(ParameterSetName='ShowByThreadId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByContentId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$ThreadId,
+		[Parameter(ParameterSetName='ShowByContentId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByThreadId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[Guid]$ContentId,
 		[Parameter(ParameterSetName='ShowByThreadId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByContentId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$PostTarget,
 		[Parameter(ParameterSetName='ShowByThreadId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByContentId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[bool]$MarkAsRead,
 
 		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
@@ -6926,6 +6302,14 @@ function Get-CommunityForumthread {
 			
 		if($PSBoundParameters.ContainsKey('GroupId')) {
 			$restParams['GroupId'] = $GroupId
+		}
+			
+		if($PSBoundParameters.ContainsKey('ContentIds')) {
+			$restParams['ContentIds'] = $ContentIds
+		}
+			
+		if($PSBoundParameters.ContainsKey('AuthorId')) {
+			$restParams['AuthorId'] = $AuthorId
 		}
 			
 		if($PSBoundParameters.ContainsKey('ForumThreadQueryType')) {
@@ -6956,6 +6340,14 @@ function Get-CommunityForumthread {
 			$restParams['IncludeSubGroups'] = $IncludeSubGroups
 		}
 			
+		if($PSBoundParameters.ContainsKey('CreatedAfterDate')) {
+			$restParams['CreatedAfterDate'] = $CreatedAfterDate
+		}
+			
+		if($PSBoundParameters.ContainsKey('CreatedBeforeDate')) {
+			$restParams['CreatedBeforeDate'] = $CreatedBeforeDate
+		}
+			
 		if($PSBoundParameters.ContainsKey('PageSize')) {
 			$restParams['PageSize'] = $PageSize
 		}
@@ -6966,6 +6358,10 @@ function Get-CommunityForumthread {
 			
 		if($PSBoundParameters.ContainsKey('ThreadId')) {
 			$restParams['ThreadId'] = $ThreadId
+		}
+			
+		if($PSBoundParameters.ContainsKey('ContentId')) {
+			$restParams['ContentId'] = $ContentId
 		}
 			
 		if($PSBoundParameters.ContainsKey('PostTarget')) {
@@ -7017,6 +6413,12 @@ function Get-CommunityForumthread {
 				$method = 'GET'
 				$pageable = $False
 				$restParams.Remove('threadid')
+			}
+			'ShowByContentId' {
+				$endpoint= "api.ashx/v2/forums/threads/${contentid}.json"
+				$method = 'GET'
+				$pageable = $False
+				$restParams.Remove('contentid')
 			}
 		}
 
@@ -7638,6 +7040,12 @@ function Get-CommunityFriendship {
 		[string]$FriendshipState,
 		[Parameter(ParameterSetName='ListByRequestorId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='ListByRequestorName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$Presence,
+		[Parameter(ParameterSetName='ListByRequestorId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ListByRequestorName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[int]$RecipientId,
+		[Parameter(ParameterSetName='ListByRequestorId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ListByRequestorName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$SortBy,
 		[Parameter(ParameterSetName='ListByRequestorId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='ListByRequestorName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
@@ -7667,6 +7075,14 @@ function Get-CommunityFriendship {
 			
 		if($PSBoundParameters.ContainsKey('FriendshipState')) {
 			$restParams['FriendshipState'] = $FriendshipState
+		}
+			
+		if($PSBoundParameters.ContainsKey('Presence')) {
+			$restParams['Presence'] = $Presence
+		}
+			
+		if($PSBoundParameters.ContainsKey('RecipientId')) {
+			$restParams['RecipientId'] = $RecipientId
 		}
 			
 		if($PSBoundParameters.ContainsKey('SortBy')) {
@@ -7932,22 +7348,37 @@ function Get-CommunityGallery {
 		[Parameter(ParameterSetName='ShowByKeyGroupId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='ShowById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByApplicationId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$GroupId,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[bool]$IncludeSubGroups,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[Guid[]]$ApplicationIds,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$PermissionId,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$NameQuery,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$SortBy,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$SortOrder,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[int]$UserId,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$PageSize,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$PageIndex,
 		[Parameter(ParameterSetName='ShowById', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByApplicationId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='ShowByKeyGroupId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$Id,
+		[Parameter(ParameterSetName='ShowByApplicationId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByKeyGroupId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[Guid]$ApplicationId,
 		[Parameter(ParameterSetName='ShowByKeyGroupId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='ShowById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByApplicationId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$Key,
 
 		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
@@ -7966,12 +7397,28 @@ function Get-CommunityGallery {
 			$restParams['IncludeSubGroups'] = $IncludeSubGroups
 		}
 			
+		if($PSBoundParameters.ContainsKey('ApplicationIds')) {
+			$restParams['ApplicationIds'] = $ApplicationIds
+		}
+			
+		if($PSBoundParameters.ContainsKey('PermissionId')) {
+			$restParams['PermissionId'] = $PermissionId
+		}
+			
+		if($PSBoundParameters.ContainsKey('NameQuery')) {
+			$restParams['NameQuery'] = $NameQuery
+		}
+			
 		if($PSBoundParameters.ContainsKey('SortBy')) {
 			$restParams['SortBy'] = $SortBy
 		}
 			
 		if($PSBoundParameters.ContainsKey('SortOrder')) {
 			$restParams['SortOrder'] = $SortOrder
+		}
+			
+		if($PSBoundParameters.ContainsKey('UserId')) {
+			$restParams['UserId'] = $UserId
 		}
 			
 		if($PSBoundParameters.ContainsKey('PageSize')) {
@@ -7984,6 +7431,10 @@ function Get-CommunityGallery {
 			
 		if($PSBoundParameters.ContainsKey('Id')) {
 			$restParams['Id'] = $Id
+		}
+			
+		if($PSBoundParameters.ContainsKey('ApplicationId')) {
+			$restParams['ApplicationId'] = $ApplicationId
 		}
 			
 		if($PSBoundParameters.ContainsKey('Key')) {
@@ -8001,6 +7452,12 @@ function Get-CommunityGallery {
 				$method = 'GET'
 				$pageable = $False
 				$restParams.Remove('id')
+			}
+			'ShowByApplicationId' {
+				$endpoint= "api.ashx/v2/galleries/${applicationid}.json"
+				$method = 'GET'
+				$pageable = $False
+				$restParams.Remove('applicationid')
 			}
 			'ShowByKeyGroupId' {
 				$endpoint= "api.ashx/v2/groups/${groupid}/galleries/${key}.json"
@@ -8281,11 +7738,11 @@ function Remove-CommunityGallery {
 	}
 }
 
-function Get-CommunityGalleryfavorite {
+function Get-CommunityGroupavatar {
 	[CmdletBinding(SupportsShouldProcess = $true)] 
 	param(
-		[Parameter(ParameterSetName='ShowByGalleryId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$GalleryId,
+		[Parameter(ParameterSetName='ShowByGroupId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+		[int]$GroupId,
 
 		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 		[ValidateNotNullOrEmpty()]
@@ -8295,16 +7752,16 @@ function Get-CommunityGalleryfavorite {
 	process {
 		$restParams = @{}
 			
-		if($PSBoundParameters.ContainsKey('GalleryId')) {
-			$restParams['GalleryId'] = $GalleryId
+		if($PSBoundParameters.ContainsKey('GroupId')) {
+			$restParams['GroupId'] = $GroupId
 		}
 	
 		switch($PSCmdlet.ParameterSetName){
-			'ShowByGalleryId' {
-				$endpoint= "api.ashx/v2/galleries/${galleryid}/favorites.json"
+			'ShowByGroupId' {
+				$endpoint= "api.ashx/v2/groups/${groupid}/avatar.json"
 				$method = 'GET'
 				$pageable = $False
-				$restParams.Remove('galleryid')
+				$restParams.Remove('groupid')
 			}
 		}
 
@@ -8339,11 +7796,17 @@ function Get-CommunityGalleryfavorite {
 	}
 }
 
-function Remove-CommunityGalleryfavorite {
+function Set-CommunityGroupavatar {
 	[CmdletBinding(SupportsShouldProcess = $true)] 
 	param(
-		[Parameter(ParameterSetName='DeleteByGalleryId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$GalleryId,
+		[Parameter(ParameterSetName='UpdateByGroupId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+		[int]$GroupId,
+		[Parameter(ParameterSetName='UpdateByGroupId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[byte[]]$FileData,
+		[Parameter(ParameterSetName='UpdateByGroupId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$FileName,
+		[Parameter(ParameterSetName='UpdateByGroupId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$FileUploadContext,
 
 		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 		[ValidateNotNullOrEmpty()]
@@ -8353,74 +7816,86 @@ function Remove-CommunityGalleryfavorite {
 	process {
 		$restParams = @{}
 			
-		if($PSBoundParameters.ContainsKey('GalleryId')) {
-			$restParams['GalleryId'] = $GalleryId
+		if($PSBoundParameters.ContainsKey('GroupId')) {
+			$restParams['GroupId'] = $GroupId
+		}
+			
+		if($PSBoundParameters.ContainsKey('FileData')) {
+			$restParams['FileData'] = $FileData
+		}
+			
+		if($PSBoundParameters.ContainsKey('FileName')) {
+			$restParams['FileName'] = $FileName
+		}
+			
+		if($PSBoundParameters.ContainsKey('FileUploadContext')) {
+			$restParams['FileUploadContext'] = $FileUploadContext
 		}
 	
 		switch($PSCmdlet.ParameterSetName){
-			'DeleteByGalleryId' {
-				$endpoint= "api.ashx/v2/galleries/${galleryid}/favorites.json"
+			'UpdateByGroupId' {
+				$endpoint= "api.ashx/v2/groups/${groupid}/avatar.json"
+				$method = 'PUT'
+				$pageable = $False
+				$restParams.Remove('groupid')
+			}
+		}
+
+		if($pageable) {
+			$pagingSplat = @{}
+			if($PSBoundParameters.ContainsKey('First')) {
+				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
+			}
+			if($PSBoundParameters.ContainsKey('Skip')) {
+				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
+			}
+			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
+				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
+			}
+
+			Invoke-CommunityRestPagedRequest  `
+				-Endpoint $endpoint `
+				-Method $method `
+				-Parameter $restParams `
+				-Credential $Credential	`
+				-Impersonate $Impersonate `
+				@pagingSplat
+		}
+		else {
+			Invoke-CommunityRestRequest  `
+				-Endpoint $endpoint `
+				-Method $method `
+				-Parameter $restParams `
+				-Credential $Credential `
+				-Impersonate $Impersonate
+		}
+	}
+}
+
+function Remove-CommunityGroupavatar {
+	[CmdletBinding(SupportsShouldProcess = $true)] 
+	param(
+		[Parameter(ParameterSetName='DeleteByGroupId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+		[int]$GroupId,
+
+		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+		[ValidateNotNullOrEmpty()]
+		[CommunityCredential]$Credential,
+		[string]$Impersonate
+	) 
+	process {
+		$restParams = @{}
+			
+		if($PSBoundParameters.ContainsKey('GroupId')) {
+			$restParams['GroupId'] = $GroupId
+		}
+	
+		switch($PSCmdlet.ParameterSetName){
+			'DeleteByGroupId' {
+				$endpoint= "api.ashx/v2/groups/${groupid}/avatar.json"
 				$method = 'DELETE'
 				$pageable = $False
-				$restParams.Remove('galleryid')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function New-CommunityGalleryfavorite {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='CreateByGalleryId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$GalleryId,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('GalleryId')) {
-			$restParams['GalleryId'] = $GalleryId
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'CreateByGalleryId' {
-				$endpoint= "api.ashx/v2/galleries/${galleryid}/favorites.json"
-				$method = 'POST'
-				$pageable = $False
-				$restParams.Remove('galleryid')
+				$restParams.Remove('groupid')
 			}
 		}
 
@@ -8705,6 +8180,8 @@ function Get-CommunityGroup {
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$GroupNameFilter,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[Guid[]]$ContainerIds,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$Permission,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$SortBy,
@@ -8716,6 +8193,8 @@ function Get-CommunityGroup {
 		[int]$PageIndex,
 		[Parameter(ParameterSetName='Show2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$Id,
+		[Parameter(ParameterSetName='Show2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[Guid]$ContainerId,
 		[Parameter(ParameterSetName='Show2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$Key,
 
@@ -8755,6 +8234,10 @@ function Get-CommunityGroup {
 			$restParams['GroupNameFilter'] = $GroupNameFilter
 		}
 			
+		if($PSBoundParameters.ContainsKey('ContainerIds')) {
+			$restParams['ContainerIds'] = $ContainerIds
+		}
+			
 		if($PSBoundParameters.ContainsKey('Permission')) {
 			$restParams['Permission'] = $Permission
 		}
@@ -8777,6 +8260,10 @@ function Get-CommunityGroup {
 			
 		if($PSBoundParameters.ContainsKey('Id')) {
 			$restParams['Id'] = $Id
+		}
+			
+		if($PSBoundParameters.ContainsKey('ContainerId')) {
+			$restParams['ContainerId'] = $ContainerId
 		}
 			
 		if($PSBoundParameters.ContainsKey('Key')) {
@@ -9106,7 +8593,11 @@ function Get-CommunityGroupuser {
 			[Parameter(ParameterSetName='ShowByGroupIdRolename', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$UserId,
 		[Parameter(ParameterSetName='ListByGroupId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[DateTime]$JoinedAfterDate,
+		[Parameter(ParameterSetName='ListByGroupId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$MembershipType,
+		[Parameter(ParameterSetName='ListByGroupId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$UsernameFilter,
 		[Parameter(ParameterSetName='ListByGroupId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$MemberType,
 		[Parameter(ParameterSetName='ListByGroupId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
@@ -9151,8 +8642,16 @@ function Get-CommunityGroupuser {
 			$restParams['UserId'] = $UserId
 		}
 			
+		if($PSBoundParameters.ContainsKey('JoinedAfterDate')) {
+			$restParams['JoinedAfterDate'] = $JoinedAfterDate
+		}
+			
 		if($PSBoundParameters.ContainsKey('MembershipType')) {
 			$restParams['MembershipType'] = $MembershipType
+		}
+			
+		if($PSBoundParameters.ContainsKey('UsernameFilter')) {
+			$restParams['UsernameFilter'] = $UsernameFilter
 		}
 			
 		if($PSBoundParameters.ContainsKey('MemberType')) {
@@ -9480,6 +8979,8 @@ function Get-CommunityHashtag {
 		[Parameter(ParameterSetName='ListByQueryText', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$ContainerId,
 		[Parameter(ParameterSetName='ListByQueryText', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$IncludeSubContainers,
+		[Parameter(ParameterSetName='ListByQueryText', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$ApplicationId,
 		[Parameter(ParameterSetName='ListByQueryText', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$ApplicationTypeId,
@@ -9502,6 +9003,10 @@ function Get-CommunityHashtag {
 			
 		if($PSBoundParameters.ContainsKey('ContainerId')) {
 			$restParams['ContainerId'] = $ContainerId
+		}
+			
+		if($PSBoundParameters.ContainsKey('IncludeSubContainers')) {
+			$restParams['IncludeSubContainers'] = $IncludeSubContainers
 		}
 			
 		if($PSBoundParameters.ContainsKey('ApplicationId')) {
@@ -9796,13 +9301,21 @@ function Get-CommunityLike {
 			[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$TypeId,
 		[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$ContentIds,
+		[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$ContainerId,
+		[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$IncludeSubContainers,
 		[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$ApplicationId,
 		[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$ContentTypeId,
 		[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$UserId,
+		[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[DateTime]$ContentCreatedAfterDate,
+		[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[DateTime]$ContentCreatedBeforeDate,
 		[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$SortBy,
 		[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
@@ -9832,8 +9345,16 @@ function Get-CommunityLike {
 			$restParams['TypeId'] = $TypeId
 		}
 			
+		if($PSBoundParameters.ContainsKey('ContentIds')) {
+			$restParams['ContentIds'] = $ContentIds
+		}
+			
 		if($PSBoundParameters.ContainsKey('ContainerId')) {
 			$restParams['ContainerId'] = $ContainerId
+		}
+			
+		if($PSBoundParameters.ContainsKey('IncludeSubContainers')) {
+			$restParams['IncludeSubContainers'] = $IncludeSubContainers
 		}
 			
 		if($PSBoundParameters.ContainsKey('ApplicationId')) {
@@ -9846,6 +9367,14 @@ function Get-CommunityLike {
 			
 		if($PSBoundParameters.ContainsKey('UserId')) {
 			$restParams['UserId'] = $UserId
+		}
+			
+		if($PSBoundParameters.ContainsKey('ContentCreatedAfterDate')) {
+			$restParams['ContentCreatedAfterDate'] = $ContentCreatedAfterDate
+		}
+			
+		if($PSBoundParameters.ContainsKey('ContentCreatedBeforeDate')) {
+			$restParams['ContentCreatedBeforeDate'] = $ContentCreatedBeforeDate
 		}
 			
 		if($PSBoundParameters.ContainsKey('SortBy')) {
@@ -10006,6 +9535,22 @@ function New-CommunityMedium {
 		[bool]$Preview,
 		[Parameter(ParameterSetName='CreateByMediaGalleryIdName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[hashtable]$ExtendedAttributes,
+		[Parameter(ParameterSetName='CreateByMediaGalleryIdName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$OpenGraphTitle,
+		[Parameter(ParameterSetName='CreateByMediaGalleryIdName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$OpenGraphDescription,
+		[Parameter(ParameterSetName='CreateByMediaGalleryIdName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$OpenGraphImageContext,
+		[Parameter(ParameterSetName='CreateByMediaGalleryIdName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$OpenGraphImageFileName,
+		[Parameter(ParameterSetName='CreateByMediaGalleryIdName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$MetaTitle,
+		[Parameter(ParameterSetName='CreateByMediaGalleryIdName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$MetaKeywords,
+		[Parameter(ParameterSetName='CreateByMediaGalleryIdName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$MetaDescription,
+		[Parameter(ParameterSetName='CreateByMediaGalleryIdName', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[DateTime]$PostDate,
 
 		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 		[ValidateNotNullOrEmpty()]
@@ -10065,6 +9610,38 @@ function New-CommunityMedium {
 			
 		if($PSBoundParameters.ContainsKey('ExtendedAttributes')) {
 			$restParams['ExtendedAttributes'] = $ExtendedAttributes
+		}
+			
+		if($PSBoundParameters.ContainsKey('OpenGraphTitle')) {
+			$restParams['OpenGraphTitle'] = $OpenGraphTitle
+		}
+			
+		if($PSBoundParameters.ContainsKey('OpenGraphDescription')) {
+			$restParams['OpenGraphDescription'] = $OpenGraphDescription
+		}
+			
+		if($PSBoundParameters.ContainsKey('OpenGraphImageContext')) {
+			$restParams['OpenGraphImageContext'] = $OpenGraphImageContext
+		}
+			
+		if($PSBoundParameters.ContainsKey('OpenGraphImageFileName')) {
+			$restParams['OpenGraphImageFileName'] = $OpenGraphImageFileName
+		}
+			
+		if($PSBoundParameters.ContainsKey('MetaTitle')) {
+			$restParams['MetaTitle'] = $MetaTitle
+		}
+			
+		if($PSBoundParameters.ContainsKey('MetaKeywords')) {
+			$restParams['MetaKeywords'] = $MetaKeywords
+		}
+			
+		if($PSBoundParameters.ContainsKey('MetaDescription')) {
+			$restParams['MetaDescription'] = $MetaDescription
+		}
+			
+		if($PSBoundParameters.ContainsKey('PostDate')) {
+			$restParams['PostDate'] = $PostDate
 		}
 	
 		switch($PSCmdlet.ParameterSetName){
@@ -10138,6 +9715,22 @@ function Set-CommunityMedium {
 		[bool]$Preview,
 		[Parameter(ParameterSetName='UpdateByMediaGalleryIdFileId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[hashtable]$ExtendedAttributes,
+		[Parameter(ParameterSetName='UpdateByMediaGalleryIdFileId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$OpenGraphTitle,
+		[Parameter(ParameterSetName='UpdateByMediaGalleryIdFileId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$OpenGraphDescription,
+		[Parameter(ParameterSetName='UpdateByMediaGalleryIdFileId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$OpenGraphImageContext,
+		[Parameter(ParameterSetName='UpdateByMediaGalleryIdFileId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$OpenGraphImageFileName,
+		[Parameter(ParameterSetName='UpdateByMediaGalleryIdFileId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$RemoveOpenGraphImage,
+		[Parameter(ParameterSetName='UpdateByMediaGalleryIdFileId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$MetaTitle,
+		[Parameter(ParameterSetName='UpdateByMediaGalleryIdFileId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$MetaKeywords,
+		[Parameter(ParameterSetName='UpdateByMediaGalleryIdFileId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$MetaDescription,
 
 		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 		[ValidateNotNullOrEmpty()]
@@ -10201,6 +9794,38 @@ function Set-CommunityMedium {
 			
 		if($PSBoundParameters.ContainsKey('ExtendedAttributes')) {
 			$restParams['ExtendedAttributes'] = $ExtendedAttributes
+		}
+			
+		if($PSBoundParameters.ContainsKey('OpenGraphTitle')) {
+			$restParams['OpenGraphTitle'] = $OpenGraphTitle
+		}
+			
+		if($PSBoundParameters.ContainsKey('OpenGraphDescription')) {
+			$restParams['OpenGraphDescription'] = $OpenGraphDescription
+		}
+			
+		if($PSBoundParameters.ContainsKey('OpenGraphImageContext')) {
+			$restParams['OpenGraphImageContext'] = $OpenGraphImageContext
+		}
+			
+		if($PSBoundParameters.ContainsKey('OpenGraphImageFileName')) {
+			$restParams['OpenGraphImageFileName'] = $OpenGraphImageFileName
+		}
+			
+		if($PSBoundParameters.ContainsKey('RemoveOpenGraphImage')) {
+			$restParams['RemoveOpenGraphImage'] = $RemoveOpenGraphImage
+		}
+			
+		if($PSBoundParameters.ContainsKey('MetaTitle')) {
+			$restParams['MetaTitle'] = $MetaTitle
+		}
+			
+		if($PSBoundParameters.ContainsKey('MetaKeywords')) {
+			$restParams['MetaKeywords'] = $MetaKeywords
+		}
+			
+		if($PSBoundParameters.ContainsKey('MetaDescription')) {
+			$restParams['MetaDescription'] = $MetaDescription
 		}
 	
 		switch($PSCmdlet.ParameterSetName){
@@ -10313,6 +9938,7 @@ function Get-CommunityMedium {
 	[CmdletBinding(SupportsShouldProcess = $true, SupportsPaging = $true)] 
 	param(
 		[Parameter(ParameterSetName='ShowByMediaGalleryIdFileId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByMediaGalleryIdFileContentId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$MediaGalleryId,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
@@ -10328,19 +9954,27 @@ function Get-CommunityMedium {
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[bool]$IncludeUnpublished,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$ContentIds,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$SortBy,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$SortOrder,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='ShowByMediaGalleryIdFileId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByMediaGalleryIdFileContentId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$PostTarget,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$PageSize,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$PageIndex,
 		[Parameter(ParameterSetName='ShowByMediaGalleryIdFileId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByMediaGalleryIdFileContentId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$FileId,
+		[Parameter(ParameterSetName='ShowByMediaGalleryIdFileContentId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByMediaGalleryIdFileId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[Guid]$FileContentId,
 		[Parameter(ParameterSetName='ShowByMediaGalleryIdFileId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByMediaGalleryIdFileContentId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$Filename,
 
 		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
@@ -10379,6 +10013,10 @@ function Get-CommunityMedium {
 			$restParams['IncludeUnpublished'] = $IncludeUnpublished
 		}
 			
+		if($PSBoundParameters.ContainsKey('ContentIds')) {
+			$restParams['ContentIds'] = $ContentIds
+		}
+			
 		if($PSBoundParameters.ContainsKey('SortBy')) {
 			$restParams['SortBy'] = $SortBy
 		}
@@ -10403,6 +10041,10 @@ function Get-CommunityMedium {
 			$restParams['FileId'] = $FileId
 		}
 			
+		if($PSBoundParameters.ContainsKey('FileContentId')) {
+			$restParams['FileContentId'] = $FileContentId
+		}
+			
 		if($PSBoundParameters.ContainsKey('Filename')) {
 			$restParams['Filename'] = $Filename
 		}
@@ -10420,361 +10062,12 @@ function Get-CommunityMedium {
 				$restParams.Remove('mediagalleryid')
 				$restParams.Remove('fileid')
 			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function Get-CommunityMediacomment {
-	[CmdletBinding(SupportsShouldProcess = $true, SupportsPaging = $true)] 
-	param(
-		[Parameter(ParameterSetName='ShowByMediaGalleryIdFileIdId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-			[Parameter(ParameterSetName='ListByMediaGalleryIdFileId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$MediaGalleryId,
-		[Parameter(ParameterSetName='ShowByMediaGalleryIdFileIdId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-			[Parameter(ParameterSetName='ListByMediaGalleryIdFileId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$FileId,
-		[Parameter(ParameterSetName='ShowByMediaGalleryIdFileIdId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$Id,
-		[Parameter(ParameterSetName='ListByMediaGalleryIdFileId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[bool]$IncludeUnpublished,
-		[Parameter(ParameterSetName='ListByMediaGalleryIdFileId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[int]$PageSize,
-		[Parameter(ParameterSetName='ListByMediaGalleryIdFileId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[int]$PageIndex,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('MediaGalleryId')) {
-			$restParams['MediaGalleryId'] = $MediaGalleryId
-		}
-			
-		if($PSBoundParameters.ContainsKey('FileId')) {
-			$restParams['FileId'] = $FileId
-		}
-			
-		if($PSBoundParameters.ContainsKey('Id')) {
-			$restParams['Id'] = $Id
-		}
-			
-		if($PSBoundParameters.ContainsKey('IncludeUnpublished')) {
-			$restParams['IncludeUnpublished'] = $IncludeUnpublished
-		}
-			
-		if($PSBoundParameters.ContainsKey('PageSize')) {
-			$restParams['PageSize'] = $PageSize
-		}
-			
-		if($PSBoundParameters.ContainsKey('PageIndex')) {
-			$restParams['PageIndex'] = $PageIndex
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'ShowByMediaGalleryIdFileIdId' {
-				$endpoint= "api.ashx/v2/media/${mediagalleryid}/files/${fileid}/comments/${id}.json"
+			'ShowByMediaGalleryIdFileContentId' {
+				$endpoint= "api.ashx/v2/media/${mediagalleryid}/files/${filecontentid}.json"
 				$method = 'GET'
 				$pageable = $False
 				$restParams.Remove('mediagalleryid')
-				$restParams.Remove('fileid')
-				$restParams.Remove('id')
-			}
-			'ListByMediaGalleryIdFileId' {
-				$endpoint= "api.ashx/v2/media/${mediagalleryid}/files/${fileid}/comments.json"
-				$method = 'GET'
-				$pageable = $True
-				$restParams.Remove('mediagalleryid')
-				$restParams.Remove('fileid')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function New-CommunityMediacomment {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='CreateByMediaGalleryIdFileIdBody', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$MediaGalleryId,
-		[Parameter(ParameterSetName='CreateByMediaGalleryIdFileIdBody', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$FileId,
-		[Parameter(ParameterSetName='CreateByMediaGalleryIdFileIdBody', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[string]$Body,
-		[Parameter(ParameterSetName='CreateByMediaGalleryIdFileIdBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[DateTime]$PublishedDate,
-		[Parameter(ParameterSetName='CreateByMediaGalleryIdFileIdBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[bool]$IsApproved,
-		[Parameter(ParameterSetName='CreateByMediaGalleryIdFileIdBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[hashtable]$ExtendedAttributes,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('MediaGalleryId')) {
-			$restParams['MediaGalleryId'] = $MediaGalleryId
-		}
-			
-		if($PSBoundParameters.ContainsKey('FileId')) {
-			$restParams['FileId'] = $FileId
-		}
-			
-		if($PSBoundParameters.ContainsKey('Body')) {
-			$restParams['Body'] = $Body
-		}
-			
-		if($PSBoundParameters.ContainsKey('PublishedDate')) {
-			$restParams['PublishedDate'] = $PublishedDate
-		}
-			
-		if($PSBoundParameters.ContainsKey('IsApproved')) {
-			$restParams['IsApproved'] = $IsApproved
-		}
-			
-		if($PSBoundParameters.ContainsKey('ExtendedAttributes')) {
-			$restParams['ExtendedAttributes'] = $ExtendedAttributes
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'CreateByMediaGalleryIdFileIdBody' {
-				$endpoint= "api.ashx/v2/media/${mediagalleryid}/files/${fileid}/comments.json"
-				$method = 'POST'
-				$pageable = $False
-				$restParams.Remove('mediagalleryid')
-				$restParams.Remove('fileid')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function Set-CommunityMediacomment {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='UpdateByMediaGalleryIdFileIdId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$MediaGalleryId,
-		[Parameter(ParameterSetName='UpdateByMediaGalleryIdFileIdId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$FileId,
-		[Parameter(ParameterSetName='UpdateByMediaGalleryIdFileIdId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$Id,
-		[Parameter(ParameterSetName='UpdateByMediaGalleryIdFileIdId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[string]$Body,
-		[Parameter(ParameterSetName='UpdateByMediaGalleryIdFileIdId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[DateTime]$PublishedDate,
-		[Parameter(ParameterSetName='UpdateByMediaGalleryIdFileIdId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[bool]$IsApproved,
-		[Parameter(ParameterSetName='UpdateByMediaGalleryIdFileIdId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[hashtable]$ExtendedAttributes,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('MediaGalleryId')) {
-			$restParams['MediaGalleryId'] = $MediaGalleryId
-		}
-			
-		if($PSBoundParameters.ContainsKey('FileId')) {
-			$restParams['FileId'] = $FileId
-		}
-			
-		if($PSBoundParameters.ContainsKey('Id')) {
-			$restParams['Id'] = $Id
-		}
-			
-		if($PSBoundParameters.ContainsKey('Body')) {
-			$restParams['Body'] = $Body
-		}
-			
-		if($PSBoundParameters.ContainsKey('PublishedDate')) {
-			$restParams['PublishedDate'] = $PublishedDate
-		}
-			
-		if($PSBoundParameters.ContainsKey('IsApproved')) {
-			$restParams['IsApproved'] = $IsApproved
-		}
-			
-		if($PSBoundParameters.ContainsKey('ExtendedAttributes')) {
-			$restParams['ExtendedAttributes'] = $ExtendedAttributes
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'UpdateByMediaGalleryIdFileIdId' {
-				$endpoint= "api.ashx/v2/media/${mediagalleryid}/files/${fileid}/comments/${id}.json"
-				$method = 'PUT'
-				$pageable = $False
-				$restParams.Remove('mediagalleryid')
-				$restParams.Remove('fileid')
-				$restParams.Remove('id')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function Remove-CommunityMediacomment {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='DeleteByIdMediaGalleryIdFileId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$Id,
-		[Parameter(ParameterSetName='DeleteByIdMediaGalleryIdFileId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$MediaGalleryId,
-		[Parameter(ParameterSetName='DeleteByIdMediaGalleryIdFileId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$FileId,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('Id')) {
-			$restParams['Id'] = $Id
-		}
-			
-		if($PSBoundParameters.ContainsKey('MediaGalleryId')) {
-			$restParams['MediaGalleryId'] = $MediaGalleryId
-		}
-			
-		if($PSBoundParameters.ContainsKey('FileId')) {
-			$restParams['FileId'] = $FileId
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'DeleteByIdMediaGalleryIdFileId' {
-				$endpoint= "api.ashx/v2/media/${mediagalleryid}/files/${fileid}/comments/${id}.json"
-				$method = 'DELETE'
-				$pageable = $False
-				$restParams.Remove('mediagalleryid')
-				$restParams.Remove('fileid')
-				$restParams.Remove('id')
+				$restParams.Remove('filecontentid')
 			}
 		}
 
@@ -12023,453 +11316,6 @@ function Get-CommunityPermission {
 	}
 }
 
-function Get-CommunityPollitem {
-	[CmdletBinding(SupportsShouldProcess = $true, SupportsPaging = $true)] 
-	param(
-		[Parameter(ParameterSetName='ListByForumIdThreadId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$ForumId,
-		[Parameter(ParameterSetName='ListByForumIdThreadId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$ThreadId,
-		[Parameter(ParameterSetName='ListByForumIdThreadId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[int]$PageSize,
-		[Parameter(ParameterSetName='ListByForumIdThreadId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[int]$PageIndex,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('ForumId')) {
-			$restParams['ForumId'] = $ForumId
-		}
-			
-		if($PSBoundParameters.ContainsKey('ThreadId')) {
-			$restParams['ThreadId'] = $ThreadId
-		}
-			
-		if($PSBoundParameters.ContainsKey('PageSize')) {
-			$restParams['PageSize'] = $PageSize
-		}
-			
-		if($PSBoundParameters.ContainsKey('PageIndex')) {
-			$restParams['PageIndex'] = $PageIndex
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'ListByForumIdThreadId' {
-				$endpoint= "api.ashx/v2/forums/${forumid}/threads/${threadid}/pollitems.json"
-				$method = 'GET'
-				$pageable = $True
-				$restParams.Remove('forumid')
-				$restParams.Remove('threadid')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function New-CommunityPollitem {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='CreateByForumIdThreadIdAnswerOrderNumber', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$ForumId,
-		[Parameter(ParameterSetName='CreateByForumIdThreadIdAnswerOrderNumber', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$ThreadId,
-		[Parameter(ParameterSetName='CreateByForumIdThreadIdAnswerOrderNumber', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[string]$Answer,
-		[Parameter(ParameterSetName='CreateByForumIdThreadIdAnswerOrderNumber', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$OrderNumber,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('ForumId')) {
-			$restParams['ForumId'] = $ForumId
-		}
-			
-		if($PSBoundParameters.ContainsKey('ThreadId')) {
-			$restParams['ThreadId'] = $ThreadId
-		}
-			
-		if($PSBoundParameters.ContainsKey('Answer')) {
-			$restParams['Answer'] = $Answer
-		}
-			
-		if($PSBoundParameters.ContainsKey('OrderNumber')) {
-			$restParams['OrderNumber'] = $OrderNumber
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'CreateByForumIdThreadIdAnswerOrderNumber' {
-				$endpoint= "api.ashx/v2/forums/${forumid}/threads/${threadid}/pollitems.json"
-				$method = 'POST'
-				$pageable = $False
-				$restParams.Remove('forumid')
-				$restParams.Remove('threadid')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function Set-CommunityPollitem {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='UpdateByForumIdThreadIdAnswerIdAnswerOrderNumber', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$ForumId,
-		[Parameter(ParameterSetName='UpdateByForumIdThreadIdAnswerIdAnswerOrderNumber', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$ThreadId,
-		[Parameter(ParameterSetName='UpdateByForumIdThreadIdAnswerIdAnswerOrderNumber', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[string]$AnswerId,
-		[Parameter(ParameterSetName='UpdateByForumIdThreadIdAnswerIdAnswerOrderNumber', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[string]$Answer,
-		[Parameter(ParameterSetName='UpdateByForumIdThreadIdAnswerIdAnswerOrderNumber', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$OrderNumber,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('ForumId')) {
-			$restParams['ForumId'] = $ForumId
-		}
-			
-		if($PSBoundParameters.ContainsKey('ThreadId')) {
-			$restParams['ThreadId'] = $ThreadId
-		}
-			
-		if($PSBoundParameters.ContainsKey('AnswerId')) {
-			$restParams['AnswerId'] = $AnswerId
-		}
-			
-		if($PSBoundParameters.ContainsKey('Answer')) {
-			$restParams['Answer'] = $Answer
-		}
-			
-		if($PSBoundParameters.ContainsKey('OrderNumber')) {
-			$restParams['OrderNumber'] = $OrderNumber
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'UpdateByForumIdThreadIdAnswerIdAnswerOrderNumber' {
-				$endpoint= "api.ashx/v2/forums/${forumid}/threads/${threadid}/pollitems/${answerid}.json"
-				$method = 'PUT'
-				$pageable = $False
-				$restParams.Remove('forumid')
-				$restParams.Remove('threadid')
-				$restParams.Remove('answerid')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function Remove-CommunityPollitem {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='DeleteByForumIdThreadIdAnswerId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$ForumId,
-		[Parameter(ParameterSetName='DeleteByForumIdThreadIdAnswerId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$ThreadId,
-		[Parameter(ParameterSetName='DeleteByForumIdThreadIdAnswerId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[string]$AnswerId,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('ForumId')) {
-			$restParams['ForumId'] = $ForumId
-		}
-			
-		if($PSBoundParameters.ContainsKey('ThreadId')) {
-			$restParams['ThreadId'] = $ThreadId
-		}
-			
-		if($PSBoundParameters.ContainsKey('AnswerId')) {
-			$restParams['AnswerId'] = $AnswerId
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'DeleteByForumIdThreadIdAnswerId' {
-				$endpoint= "api.ashx/v2/forums/${forumid}/threads/${threadid}/pollitems/${answerid}.json"
-				$method = 'DELETE'
-				$pageable = $False
-				$restParams.Remove('forumid')
-				$restParams.Remove('threadid')
-				$restParams.Remove('answerid')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function Get-CommunityPollitemvote {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='ShowByForumIdThreadId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$ForumId,
-		[Parameter(ParameterSetName='ShowByForumIdThreadId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$ThreadId,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('ForumId')) {
-			$restParams['ForumId'] = $ForumId
-		}
-			
-		if($PSBoundParameters.ContainsKey('ThreadId')) {
-			$restParams['ThreadId'] = $ThreadId
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'ShowByForumIdThreadId' {
-				$endpoint= "api.ashx/v2/forums/${forumid}/threads/${threadid}/pollitems/votes.json"
-				$method = 'GET'
-				$pageable = $False
-				$restParams.Remove('forumid')
-				$restParams.Remove('threadid')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function New-CommunityPollitemvote {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='CreateByForumIdThreadIdAnswerId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$ForumId,
-		[Parameter(ParameterSetName='CreateByForumIdThreadIdAnswerId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$ThreadId,
-		[Parameter(ParameterSetName='CreateByForumIdThreadIdAnswerId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[string]$AnswerId,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('ForumId')) {
-			$restParams['ForumId'] = $ForumId
-		}
-			
-		if($PSBoundParameters.ContainsKey('ThreadId')) {
-			$restParams['ThreadId'] = $ThreadId
-		}
-			
-		if($PSBoundParameters.ContainsKey('AnswerId')) {
-			$restParams['AnswerId'] = $AnswerId
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'CreateByForumIdThreadIdAnswerId' {
-				$endpoint= "api.ashx/v2/forums/${forumid}/threads/${threadid}/pollitems/votes/${answerid}.json"
-				$method = 'POST'
-				$pageable = $False
-				$restParams.Remove('forumid')
-				$restParams.Remove('threadid')
-				$restParams.Remove('answerid')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
 function Get-CommunityRateditem {
 	[CmdletBinding(SupportsShouldProcess = $true, SupportsPaging = $true)] 
 	param(
@@ -12477,6 +11323,8 @@ function Get-CommunityRateditem {
 		[Guid]$ApplicationId,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$ContainerId,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$IncludeSubContainers,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$ContentTypeId,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
@@ -12509,6 +11357,10 @@ function Get-CommunityRateditem {
 			
 		if($PSBoundParameters.ContainsKey('ContainerId')) {
 			$restParams['ContainerId'] = $ContainerId
+		}
+			
+		if($PSBoundParameters.ContainsKey('IncludeSubContainers')) {
+			$restParams['IncludeSubContainers'] = $IncludeSubContainers
 		}
 			
 		if($PSBoundParameters.ContainsKey('ContentTypeId')) {
@@ -12683,6 +11535,8 @@ function Get-CommunityRating {
 		[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$ContainerId,
 		[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$IncludeSubContainers,
+		[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$ApplicationId,
 		[Parameter(ParameterSetName='List2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$ContentTypeId,
@@ -12719,6 +11573,10 @@ function Get-CommunityRating {
 			
 		if($PSBoundParameters.ContainsKey('ContainerId')) {
 			$restParams['ContainerId'] = $ContainerId
+		}
+			
+		if($PSBoundParameters.ContainsKey('IncludeSubContainers')) {
+			$restParams['IncludeSubContainers'] = $IncludeSubContainers
 		}
 			
 		if($PSBoundParameters.ContainsKey('ApplicationId')) {
@@ -13044,6 +11902,8 @@ function Get-CommunityRole {
 			[Parameter(ParameterSetName='ShowByApplicationIdRoleId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$Include,
 		[Parameter(ParameterSetName='ListByApplication', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$IncludeWithAvatarOnly,
+		[Parameter(ParameterSetName='ListByApplication', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$PageSize,
 		[Parameter(ParameterSetName='ListByApplication', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$PageIndex,
@@ -13084,6 +11944,10 @@ function Get-CommunityRole {
 			
 		if($PSBoundParameters.ContainsKey('Include')) {
 			$restParams['Include'] = $Include
+		}
+			
+		if($PSBoundParameters.ContainsKey('IncludeWithAvatarOnly')) {
+			$restParams['IncludeWithAvatarOnly'] = $IncludeWithAvatarOnly
 		}
 			
 		if($PSBoundParameters.ContainsKey('PageSize')) {
@@ -14389,7 +13253,11 @@ function Get-CommunityStory {
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid[]]$ContainerIds,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$IncludeSubContainers,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[Guid]$ApplicationId,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$StoryIds,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$UserId,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
@@ -14410,6 +13278,10 @@ function Get-CommunityStory {
 		[int]$PageIndex,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[hashtable]$Filters,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$IncludeUserEffectiveMemberGroups,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$IncludeAllJoinlessGroups,
 
 		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 		[ValidateNotNullOrEmpty()]
@@ -14443,8 +13315,16 @@ function Get-CommunityStory {
 			$restParams['ContainerIds'] = $ContainerIds
 		}
 			
+		if($PSBoundParameters.ContainsKey('IncludeSubContainers')) {
+			$restParams['IncludeSubContainers'] = $IncludeSubContainers
+		}
+			
 		if($PSBoundParameters.ContainsKey('ApplicationId')) {
 			$restParams['ApplicationId'] = $ApplicationId
+		}
+			
+		if($PSBoundParameters.ContainsKey('StoryIds')) {
+			$restParams['StoryIds'] = $StoryIds
 		}
 			
 		if($PSBoundParameters.ContainsKey('UserId')) {
@@ -14485,6 +13365,14 @@ function Get-CommunityStory {
 			
 		if($PSBoundParameters.ContainsKey('Filters')) {
 			$restParams['Filters'] = $Filters
+		}
+			
+		if($PSBoundParameters.ContainsKey('IncludeUserEffectiveMemberGroups')) {
+			$restParams['IncludeUserEffectiveMemberGroups'] = $IncludeUserEffectiveMemberGroups
+		}
+			
+		if($PSBoundParameters.ContainsKey('IncludeAllJoinlessGroups')) {
+			$restParams['IncludeAllJoinlessGroups'] = $IncludeAllJoinlessGroups
 		}
 	
 		switch($PSCmdlet.ParameterSetName){
@@ -15296,6 +14184,8 @@ function Get-CommunityUserprofilefield {
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$UserProfileFieldGroupId,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$IsSearchable,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$PageSize,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$PageIndex,
@@ -15312,6 +14202,10 @@ function Get-CommunityUserprofilefield {
 			
 		if($PSBoundParameters.ContainsKey('UserProfileFieldGroupId')) {
 			$restParams['UserProfileFieldGroupId'] = $UserProfileFieldGroupId
+		}
+			
+		if($PSBoundParameters.ContainsKey('IsSearchable')) {
+			$restParams['IsSearchable'] = $IsSearchable
 		}
 			
 		if($PSBoundParameters.ContainsKey('PageSize')) {
@@ -15628,6 +14522,9 @@ function Get-CommunityUser {
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string[]]$Usernames,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$ContentIds,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='Show2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$EmailAddress,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$RoleId,
@@ -15645,11 +14542,11 @@ function Get-CommunityUser {
 		[int]$PageSize,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$PageIndex,
-		[Parameter(ParameterSetName='ShowById', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-			[Parameter(ParameterSetName='ShowByUsername', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[Parameter(ParameterSetName='Show2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$Id,
-		[Parameter(ParameterSetName='ShowByUsername', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-			[Parameter(ParameterSetName='ShowById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[Parameter(ParameterSetName='Show2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[Guid]$MembershipId,
+		[Parameter(ParameterSetName='Show2', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$Username,
 
 		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
@@ -15666,6 +14563,10 @@ function Get-CommunityUser {
 			
 		if($PSBoundParameters.ContainsKey('Usernames')) {
 			$restParams['Usernames'] = $Usernames
+		}
+			
+		if($PSBoundParameters.ContainsKey('ContentIds')) {
+			$restParams['ContentIds'] = $ContentIds
 		}
 			
 		if($PSBoundParameters.ContainsKey('EmailAddress')) {
@@ -15708,6 +14609,10 @@ function Get-CommunityUser {
 			$restParams['Id'] = $Id
 		}
 			
+		if($PSBoundParameters.ContainsKey('MembershipId')) {
+			$restParams['MembershipId'] = $MembershipId
+		}
+			
 		if($PSBoundParameters.ContainsKey('Username')) {
 			$restParams['Username'] = $Username
 		}
@@ -15718,17 +14623,10 @@ function Get-CommunityUser {
 				$method = 'GET'
 				$pageable = $True
 			}
-			'ShowById' {
-				$endpoint= "api.ashx/v2/users/${id}.json"
+			'Show2' {
+				$endpoint= "api.ashx/v2/user.json"
 				$method = 'GET'
 				$pageable = $False
-				$restParams.Remove('id')
-			}
-			'ShowByUsername' {
-				$endpoint= "api.ashx/v2/users/${username}.json"
-				$method = 'GET'
-				$pageable = $False
-				$restParams.Remove('username')
 			}
 		}
 
@@ -15787,6 +14685,12 @@ function Set-CommunityUser {
 		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='UpdateByLookupUsername', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$PrivateEmail,
+		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='UpdateByLookupUsername', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$IsIgnored,
+		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='UpdateByLookupUsername', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$ForceLogin,
 		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='UpdateByLookupUsername', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$DisplayName,
@@ -15873,6 +14777,12 @@ function Set-CommunityUser {
 		[string]$AccountStatus,
 		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='UpdateByLookupUsername', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$BanReason,
+		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='UpdateByLookupUsername', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[DateTime]$BannedUntil,
+		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='UpdateByLookupUsername', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[hashtable]$ProfileFields,
 		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='UpdateByLookupUsername', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
@@ -15883,6 +14793,9 @@ function Set-CommunityUser {
 		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='UpdateByLookupUsername', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string[]]$EnabledActivityMessageTypes,
+		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='UpdateByLookupUsername', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$ModerationLevel,
 
 		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 		[ValidateNotNullOrEmpty()]
@@ -15918,6 +14831,14 @@ function Set-CommunityUser {
 			
 		if($PSBoundParameters.ContainsKey('PrivateEmail')) {
 			$restParams['PrivateEmail'] = $PrivateEmail
+		}
+			
+		if($PSBoundParameters.ContainsKey('IsIgnored')) {
+			$restParams['IsIgnored'] = $IsIgnored
+		}
+			
+		if($PSBoundParameters.ContainsKey('ForceLogin')) {
+			$restParams['ForceLogin'] = $ForceLogin
 		}
 			
 		if($PSBoundParameters.ContainsKey('DisplayName')) {
@@ -16032,6 +14953,14 @@ function Set-CommunityUser {
 			$restParams['AccountStatus'] = $AccountStatus
 		}
 			
+		if($PSBoundParameters.ContainsKey('BanReason')) {
+			$restParams['BanReason'] = $BanReason
+		}
+			
+		if($PSBoundParameters.ContainsKey('BannedUntil')) {
+			$restParams['BannedUntil'] = $BannedUntil
+		}
+			
 		if($PSBoundParameters.ContainsKey('ProfileFields')) {
 			$restParams['ProfileFields'] = $ProfileFields
 		}
@@ -16046,6 +14975,10 @@ function Set-CommunityUser {
 			
 		if($PSBoundParameters.ContainsKey('EnabledActivityMessageTypes')) {
 			$restParams['EnabledActivityMessageTypes'] = $EnabledActivityMessageTypes
+		}
+			
+		if($PSBoundParameters.ContainsKey('ModerationLevel')) {
+			$restParams['ModerationLevel'] = $ModerationLevel
 		}
 	
 		switch($PSCmdlet.ParameterSetName){
@@ -16109,6 +15042,9 @@ function Remove-CommunityUser {
 		[Parameter(ParameterSetName='DeleteById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='DeleteByUsername', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$ReassignedUsername,
+		[Parameter(ParameterSetName='DeleteById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='DeleteByUsername', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$DeleteAllContent,
 
 		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 		[ValidateNotNullOrEmpty()]
@@ -16132,6 +15068,10 @@ function Remove-CommunityUser {
 			
 		if($PSBoundParameters.ContainsKey('ReassignedUsername')) {
 			$restParams['ReassignedUsername'] = $ReassignedUsername
+		}
+			
+		if($PSBoundParameters.ContainsKey('DeleteAllContent')) {
+			$restParams['DeleteAllContent'] = $DeleteAllContent
 		}
 	
 		switch($PSCmdlet.ParameterSetName){
@@ -16209,528 +15149,6 @@ function New-CommunityUservalidation {
 				$endpoint= "api.ashx/v2/users/validate.json"
 				$method = 'POST'
 				$pageable = $False
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function Get-CommunityWikicomment {
-	[CmdletBinding(SupportsShouldProcess = $true, SupportsPaging = $true)] 
-	param(
-		[Parameter(ParameterSetName='ShowById', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$Id,
-		[Parameter(ParameterSetName='ListByWikiIdWikiPageId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$WikiId,
-		[Parameter(ParameterSetName='ListByWikiIdWikiPageId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$WikiPageId,
-		[Parameter(ParameterSetName='ListByWikiIdWikiPageId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[int]$PageSize,
-		[Parameter(ParameterSetName='ListByWikiIdWikiPageId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[int]$PageIndex,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('Id')) {
-			$restParams['Id'] = $Id
-		}
-			
-		if($PSBoundParameters.ContainsKey('WikiId')) {
-			$restParams['WikiId'] = $WikiId
-		}
-			
-		if($PSBoundParameters.ContainsKey('WikiPageId')) {
-			$restParams['WikiPageId'] = $WikiPageId
-		}
-			
-		if($PSBoundParameters.ContainsKey('PageSize')) {
-			$restParams['PageSize'] = $PageSize
-		}
-			
-		if($PSBoundParameters.ContainsKey('PageIndex')) {
-			$restParams['PageIndex'] = $PageIndex
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'ShowById' {
-				$endpoint= "api.ashx/v2/wikis/${wikiid}/pages/${wikipageid}/comments/${id}.json"
-				$method = 'GET'
-				$pageable = $False
-				$restParams.Remove('wikiid')
-				$restParams.Remove('wikipageid')
-				$restParams.Remove('id')
-			}
-			'ListByWikiIdWikiPageId' {
-				$endpoint= "api.ashx/v2/wikis/${wikiid}/pages/${wikipageid}/comments.json"
-				$method = 'GET'
-				$pageable = $True
-				$restParams.Remove('wikiid')
-				$restParams.Remove('wikipageid')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function New-CommunityWikicomment {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='CreateByWikiIdWikiPageIdBody', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$WikiId,
-		[Parameter(ParameterSetName='CreateByWikiIdWikiPageIdBody', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$WikiPageId,
-		[Parameter(ParameterSetName='CreateByWikiIdWikiPageIdBody', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[string]$Body,
-		[Parameter(ParameterSetName='CreateByWikiIdWikiPageIdBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[DateTime]$PublishedDate,
-		[Parameter(ParameterSetName='CreateByWikiIdWikiPageIdBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[bool]$IsApproved,
-		[Parameter(ParameterSetName='CreateByWikiIdWikiPageIdBody', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[hashtable]$ExtendedAttributes,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('WikiId')) {
-			$restParams['WikiId'] = $WikiId
-		}
-			
-		if($PSBoundParameters.ContainsKey('WikiPageId')) {
-			$restParams['WikiPageId'] = $WikiPageId
-		}
-			
-		if($PSBoundParameters.ContainsKey('Body')) {
-			$restParams['Body'] = $Body
-		}
-			
-		if($PSBoundParameters.ContainsKey('PublishedDate')) {
-			$restParams['PublishedDate'] = $PublishedDate
-		}
-			
-		if($PSBoundParameters.ContainsKey('IsApproved')) {
-			$restParams['IsApproved'] = $IsApproved
-		}
-			
-		if($PSBoundParameters.ContainsKey('ExtendedAttributes')) {
-			$restParams['ExtendedAttributes'] = $ExtendedAttributes
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'CreateByWikiIdWikiPageIdBody' {
-				$endpoint= "api.ashx/v2/wikis/${wikiid}/pages/${wikipageid}/comments.json"
-				$method = 'POST'
-				$pageable = $False
-				$restParams.Remove('wikiid')
-				$restParams.Remove('wikipageid')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function Set-CommunityWikicomment {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='UpdateByWikiIdWikiPageIdId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$WikiId,
-		[Parameter(ParameterSetName='UpdateByWikiIdWikiPageIdId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$WikiPageId,
-		[Parameter(ParameterSetName='UpdateByWikiIdWikiPageIdId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$Id,
-		[Parameter(ParameterSetName='UpdateByWikiIdWikiPageIdId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[string]$Body,
-		[Parameter(ParameterSetName='UpdateByWikiIdWikiPageIdId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[DateTime]$PublishedDate,
-		[Parameter(ParameterSetName='UpdateByWikiIdWikiPageIdId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[bool]$IsApproved,
-		[Parameter(ParameterSetName='UpdateByWikiIdWikiPageIdId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[hashtable]$ExtendedAttributes,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('WikiId')) {
-			$restParams['WikiId'] = $WikiId
-		}
-			
-		if($PSBoundParameters.ContainsKey('WikiPageId')) {
-			$restParams['WikiPageId'] = $WikiPageId
-		}
-			
-		if($PSBoundParameters.ContainsKey('Id')) {
-			$restParams['Id'] = $Id
-		}
-			
-		if($PSBoundParameters.ContainsKey('Body')) {
-			$restParams['Body'] = $Body
-		}
-			
-		if($PSBoundParameters.ContainsKey('PublishedDate')) {
-			$restParams['PublishedDate'] = $PublishedDate
-		}
-			
-		if($PSBoundParameters.ContainsKey('IsApproved')) {
-			$restParams['IsApproved'] = $IsApproved
-		}
-			
-		if($PSBoundParameters.ContainsKey('ExtendedAttributes')) {
-			$restParams['ExtendedAttributes'] = $ExtendedAttributes
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'UpdateByWikiIdWikiPageIdId' {
-				$endpoint= "api.ashx/v2/wikis/${wikiid}/pages/${wikipageid}/comments/${id}.json"
-				$method = 'PUT'
-				$pageable = $False
-				$restParams.Remove('wikiid')
-				$restParams.Remove('wikipageid')
-				$restParams.Remove('id')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function Remove-CommunityWikicomment {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='DeleteByIdWikiIdWikiPageId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$Id,
-		[Parameter(ParameterSetName='DeleteByIdWikiIdWikiPageId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$WikiId,
-		[Parameter(ParameterSetName='DeleteByIdWikiIdWikiPageId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$WikiPageId,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('Id')) {
-			$restParams['Id'] = $Id
-		}
-			
-		if($PSBoundParameters.ContainsKey('WikiId')) {
-			$restParams['WikiId'] = $WikiId
-		}
-			
-		if($PSBoundParameters.ContainsKey('WikiPageId')) {
-			$restParams['WikiPageId'] = $WikiPageId
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'DeleteByIdWikiIdWikiPageId' {
-				$endpoint= "api.ashx/v2/wikis/${wikiid}/pages/${wikipageid}/comments/${id}.json"
-				$method = 'DELETE'
-				$pageable = $False
-				$restParams.Remove('wikiid')
-				$restParams.Remove('wikipageid')
-				$restParams.Remove('id')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function Get-CommunityWikifavorite {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='ShowByWikiId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$WikiId,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('WikiId')) {
-			$restParams['WikiId'] = $WikiId
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'ShowByWikiId' {
-				$endpoint= "api.ashx/v2/wikis/${wikiid}/favorites.json"
-				$method = 'GET'
-				$pageable = $False
-				$restParams.Remove('wikiid')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function Remove-CommunityWikifavorite {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='DeleteByWikiId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$WikiId,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('WikiId')) {
-			$restParams['WikiId'] = $WikiId
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'DeleteByWikiId' {
-				$endpoint= "api.ashx/v2/wikis/${wikiid}/favorites.json"
-				$method = 'DELETE'
-				$pageable = $False
-				$restParams.Remove('wikiid')
-			}
-		}
-
-		if($pageable) {
-			$pagingSplat = @{}
-			if($PSBoundParameters.ContainsKey('First')) {
-				$pagingSplat['First'] = $PSCmdlet.PagingParameters.First
-			}
-			if($PSBoundParameters.ContainsKey('Skip')) {
-				$pagingSplat['Skip'] = $PSCmdlet.PagingParameters.Skip
-			}
-			if($PSBoundParameters.ContainsKey('IncludeTotalCount')) {
-				$pagingSplat['IncludeTotalCount'] = $PSCmdlet.PagingParameters.IncludeTotalCount
-			}
-
-			Invoke-CommunityRestPagedRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential	`
-				-Impersonate $Impersonate `
-				@pagingSplat
-		}
-		else {
-			Invoke-CommunityRestRequest  `
-				-Endpoint $endpoint `
-				-Method $method `
-				-Parameter $restParams `
-				-Credential $Credential `
-				-Impersonate $Impersonate
-		}
-	}
-}
-
-function New-CommunityWikifavorite {
-	[CmdletBinding(SupportsShouldProcess = $true)] 
-	param(
-		[Parameter(ParameterSetName='CreateByWikiId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[int]$WikiId,
-
-		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-		[ValidateNotNullOrEmpty()]
-		[CommunityCredential]$Credential,
-		[string]$Impersonate
-	) 
-	process {
-		$restParams = @{}
-			
-		if($PSBoundParameters.ContainsKey('WikiId')) {
-			$restParams['WikiId'] = $WikiId
-		}
-	
-		switch($PSCmdlet.ParameterSetName){
-			'CreateByWikiId' {
-				$endpoint= "api.ashx/v2/wikis/${wikiid}/favorites.json"
-				$method = 'POST'
-				$pageable = $False
-				$restParams.Remove('wikiid')
 			}
 		}
 
@@ -17257,10 +15675,35 @@ function Remove-CommunityWikipagerevision {
 function Get-CommunityWikipage {
 	[CmdletBinding(SupportsShouldProcess = $true, SupportsPaging = $true)] 
 	param(
-		[Parameter(ParameterSetName='ListByWikiId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-			[Parameter(ParameterSetName='ShowByPageKeyWikiId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+		[Parameter(ParameterSetName='ShowById', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByWikiId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByContentId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[int]$Id,
+		[Parameter(ParameterSetName='ShowByContentId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByWikiId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='ShowById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[Guid]$ContentId,
+		[Parameter(ParameterSetName='ShowByWikiId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByContentId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$PageKey,
+		[Parameter(ParameterSetName='ShowByWikiId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ListByWikiId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByContentId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$WikiId,
+		[Parameter(ParameterSetName='ShowByWikiId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByContentId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$PostTarget,
+		[Parameter(ParameterSetName='ShowByWikiId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByContentId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[int]$ForumThreadId,
+		[Parameter(ParameterSetName='ShowByWikiId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByContentId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$PageTitle,
 		[Parameter(ParameterSetName='ListByWikiId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$ParentPageId,
 		[Parameter(ParameterSetName='ListByWikiId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
@@ -17276,25 +15719,17 @@ function Get-CommunityWikipage {
 		[Parameter(ParameterSetName='ListByWikiId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$AuthorId,
 		[Parameter(ParameterSetName='ListByWikiId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$ContentIds,
+		[Parameter(ParameterSetName='ListByWikiId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$SortBy,
 		[Parameter(ParameterSetName='ListByWikiId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$SortOrder,
 		[Parameter(ParameterSetName='ListByWikiId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$ShowHiddenInTableOfContents,
+		[Parameter(ParameterSetName='ListByWikiId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$PageSize,
 		[Parameter(ParameterSetName='ListByWikiId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$PageIndex,
-		[Parameter(ParameterSetName='ShowById', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-			[Parameter(ParameterSetName='ShowByPageKeyWikiId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[int]$Id,
-		[Parameter(ParameterSetName='ShowByPageKeyWikiId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
-			[Parameter(ParameterSetName='ShowById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[string]$PageKey,
-		[Parameter(ParameterSetName='ShowByPageKeyWikiId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-			[Parameter(ParameterSetName='ShowById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[string]$PostTarget,
-		[Parameter(ParameterSetName='ShowByPageKeyWikiId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-			[Parameter(ParameterSetName='ShowById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-		[int]$ForumThreadId,
 
 		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 		[ValidateNotNullOrEmpty()]
@@ -17304,8 +15739,32 @@ function Get-CommunityWikipage {
 	process {
 		$restParams = @{}
 			
+		if($PSBoundParameters.ContainsKey('Id')) {
+			$restParams['Id'] = $Id
+		}
+			
+		if($PSBoundParameters.ContainsKey('ContentId')) {
+			$restParams['ContentId'] = $ContentId
+		}
+			
+		if($PSBoundParameters.ContainsKey('PageKey')) {
+			$restParams['PageKey'] = $PageKey
+		}
+			
 		if($PSBoundParameters.ContainsKey('WikiId')) {
 			$restParams['WikiId'] = $WikiId
+		}
+			
+		if($PSBoundParameters.ContainsKey('PostTarget')) {
+			$restParams['PostTarget'] = $PostTarget
+		}
+			
+		if($PSBoundParameters.ContainsKey('ForumThreadId')) {
+			$restParams['ForumThreadId'] = $ForumThreadId
+		}
+			
+		if($PSBoundParameters.ContainsKey('PageTitle')) {
+			$restParams['PageTitle'] = $PageTitle
 		}
 			
 		if($PSBoundParameters.ContainsKey('ParentPageId')) {
@@ -17336,12 +15795,20 @@ function Get-CommunityWikipage {
 			$restParams['AuthorId'] = $AuthorId
 		}
 			
+		if($PSBoundParameters.ContainsKey('ContentIds')) {
+			$restParams['ContentIds'] = $ContentIds
+		}
+			
 		if($PSBoundParameters.ContainsKey('SortBy')) {
 			$restParams['SortBy'] = $SortBy
 		}
 			
 		if($PSBoundParameters.ContainsKey('SortOrder')) {
 			$restParams['SortOrder'] = $SortOrder
+		}
+			
+		if($PSBoundParameters.ContainsKey('ShowHiddenInTableOfContents')) {
+			$restParams['ShowHiddenInTableOfContents'] = $ShowHiddenInTableOfContents
 		}
 			
 		if($PSBoundParameters.ContainsKey('PageSize')) {
@@ -17351,42 +15818,31 @@ function Get-CommunityWikipage {
 		if($PSBoundParameters.ContainsKey('PageIndex')) {
 			$restParams['PageIndex'] = $PageIndex
 		}
-			
-		if($PSBoundParameters.ContainsKey('Id')) {
-			$restParams['Id'] = $Id
-		}
-			
-		if($PSBoundParameters.ContainsKey('PageKey')) {
-			$restParams['PageKey'] = $PageKey
-		}
-			
-		if($PSBoundParameters.ContainsKey('PostTarget')) {
-			$restParams['PostTarget'] = $PostTarget
-		}
-			
-		if($PSBoundParameters.ContainsKey('ForumThreadId')) {
-			$restParams['ForumThreadId'] = $ForumThreadId
-		}
 	
 		switch($PSCmdlet.ParameterSetName){
-			'ListByWikiId' {
+			'ShowByWikiId' {
 				$endpoint= "api.ashx/v2/wikis/${wikiid}/pages.json"
-				$method = 'GET'
-				$pageable = $True
-				$restParams.Remove('wikiid')
-			}
-			'ShowByPageKeyWikiId' {
-				$endpoint= "api.ashx/v2/wikis/${wikiid}/pages/${pagekey}.json"
 				$method = 'GET'
 				$pageable = $False
 				$restParams.Remove('wikiid')
-				$restParams.Remove('pagekey')
 			}
 			'ShowById' {
 				$endpoint= "api.ashx/v2/wikis/pages/${id}.json"
 				$method = 'GET'
 				$pageable = $False
 				$restParams.Remove('id')
+			}
+			'ShowByContentId' {
+				$endpoint= "api.ashx/v2/wikis/pages/${contentid}.json"
+				$method = 'GET'
+				$pageable = $False
+				$restParams.Remove('contentid')
+			}
+			'ListByWikiId' {
+				$endpoint= "api.ashx/v2/wikis/${wikiid}/pages.json"
+				$method = 'GET'
+				$pageable = $True
+				$restParams.Remove('wikiid')
 			}
 		}
 
@@ -17449,7 +15905,19 @@ function Set-CommunityWikipage {
 		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$ForumThreadId,
 		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[DateTime]$LastModifiedDate,
+		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[bool]$SaveRevision,
+		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$MetaTitle,
+		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$MetaKeywords,
+		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$MetaDescription,
+		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[int]$Position,
+		[Parameter(ParameterSetName='UpdateById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$HideInTableOfContents,
 
 		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 		[ValidateNotNullOrEmpty()]
@@ -17507,8 +15975,32 @@ function Set-CommunityWikipage {
 			$restParams['ForumThreadId'] = $ForumThreadId
 		}
 			
+		if($PSBoundParameters.ContainsKey('LastModifiedDate')) {
+			$restParams['LastModifiedDate'] = $LastModifiedDate
+		}
+			
 		if($PSBoundParameters.ContainsKey('SaveRevision')) {
 			$restParams['SaveRevision'] = $SaveRevision
+		}
+			
+		if($PSBoundParameters.ContainsKey('MetaTitle')) {
+			$restParams['MetaTitle'] = $MetaTitle
+		}
+			
+		if($PSBoundParameters.ContainsKey('MetaKeywords')) {
+			$restParams['MetaKeywords'] = $MetaKeywords
+		}
+			
+		if($PSBoundParameters.ContainsKey('MetaDescription')) {
+			$restParams['MetaDescription'] = $MetaDescription
+		}
+			
+		if($PSBoundParameters.ContainsKey('Position')) {
+			$restParams['Position'] = $Position
+		}
+			
+		if($PSBoundParameters.ContainsKey('HideInTableOfContents')) {
+			$restParams['HideInTableOfContents'] = $HideInTableOfContents
 		}
 	
 		switch($PSCmdlet.ParameterSetName){
@@ -17576,6 +16068,18 @@ function New-CommunityWikipage {
 		[string[]]$Tags,
 		[Parameter(ParameterSetName='CreateByWikiIdTitle', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$ForumThreadId,
+		[Parameter(ParameterSetName='CreateByWikiIdTitle', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[DateTime]$CreatedDate,
+		[Parameter(ParameterSetName='CreateByWikiIdTitle', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$MetaTitle,
+		[Parameter(ParameterSetName='CreateByWikiIdTitle', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$MetaKeywords,
+		[Parameter(ParameterSetName='CreateByWikiIdTitle', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$MetaDescription,
+		[Parameter(ParameterSetName='CreateByWikiIdTitle', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[int]$Position,
+		[Parameter(ParameterSetName='CreateByWikiIdTitle', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$HideInTableOfContents,
 
 		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 		[ValidateNotNullOrEmpty()]
@@ -17627,6 +16131,30 @@ function New-CommunityWikipage {
 			
 		if($PSBoundParameters.ContainsKey('ForumThreadId')) {
 			$restParams['ForumThreadId'] = $ForumThreadId
+		}
+			
+		if($PSBoundParameters.ContainsKey('CreatedDate')) {
+			$restParams['CreatedDate'] = $CreatedDate
+		}
+			
+		if($PSBoundParameters.ContainsKey('MetaTitle')) {
+			$restParams['MetaTitle'] = $MetaTitle
+		}
+			
+		if($PSBoundParameters.ContainsKey('MetaKeywords')) {
+			$restParams['MetaKeywords'] = $MetaKeywords
+		}
+			
+		if($PSBoundParameters.ContainsKey('MetaDescription')) {
+			$restParams['MetaDescription'] = $MetaDescription
+		}
+			
+		if($PSBoundParameters.ContainsKey('Position')) {
+			$restParams['Position'] = $Position
+		}
+			
+		if($PSBoundParameters.ContainsKey('HideInTableOfContents')) {
+			$restParams['HideInTableOfContents'] = $HideInTableOfContents
 		}
 	
 		switch($PSCmdlet.ParameterSetName){
@@ -17876,22 +16404,35 @@ function Get-CommunityWiki {
 		[Parameter(ParameterSetName='ShowByKeyGroupId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='ShowById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByApplicationId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$GroupId,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[bool]$IncludeSubGroups,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[Guid[]]$ApplicationIds,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[bool]$IncludeDisabled,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[string]$PermissionId,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$SortBy,
+		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[int]$UserId,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$PageSize,
 		[Parameter(ParameterSetName='List1', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$PageIndex,
 		[Parameter(ParameterSetName='ShowById', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByApplicationId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='ShowByKeyGroupId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$Id,
+		[Parameter(ParameterSetName='ShowByApplicationId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByKeyGroupId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[Guid]$ApplicationId,
 		[Parameter(ParameterSetName='ShowByKeyGroupId', Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 			[Parameter(ParameterSetName='ShowById', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+			[Parameter(ParameterSetName='ShowByApplicationId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[string]$Key,
 
 		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
@@ -17910,12 +16451,24 @@ function Get-CommunityWiki {
 			$restParams['IncludeSubGroups'] = $IncludeSubGroups
 		}
 			
+		if($PSBoundParameters.ContainsKey('ApplicationIds')) {
+			$restParams['ApplicationIds'] = $ApplicationIds
+		}
+			
 		if($PSBoundParameters.ContainsKey('IncludeDisabled')) {
 			$restParams['IncludeDisabled'] = $IncludeDisabled
 		}
 			
+		if($PSBoundParameters.ContainsKey('PermissionId')) {
+			$restParams['PermissionId'] = $PermissionId
+		}
+			
 		if($PSBoundParameters.ContainsKey('SortBy')) {
 			$restParams['SortBy'] = $SortBy
+		}
+			
+		if($PSBoundParameters.ContainsKey('UserId')) {
+			$restParams['UserId'] = $UserId
 		}
 			
 		if($PSBoundParameters.ContainsKey('PageSize')) {
@@ -17928,6 +16481,10 @@ function Get-CommunityWiki {
 			
 		if($PSBoundParameters.ContainsKey('Id')) {
 			$restParams['Id'] = $Id
+		}
+			
+		if($PSBoundParameters.ContainsKey('ApplicationId')) {
+			$restParams['ApplicationId'] = $ApplicationId
 		}
 			
 		if($PSBoundParameters.ContainsKey('Key')) {
@@ -17945,6 +16502,12 @@ function Get-CommunityWiki {
 				$method = 'GET'
 				$pageable = $False
 				$restParams.Remove('id')
+			}
+			'ShowByApplicationId' {
+				$endpoint= "api.ashx/v2/wikis/${applicationid}.json"
+				$method = 'GET'
+				$pageable = $False
+				$restParams.Remove('applicationid')
 			}
 			'ShowByKeyGroupId' {
 				$endpoint= "api.ashx/v2/groups/${groupid}/wikis/${key}.json"
@@ -18220,6 +16783,8 @@ function Get-CommunityWikitoc {
 		[int]$WikiId,
 		[Parameter(ParameterSetName='ShowByWikiId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
 		[int]$WikiPageId,
+		[Parameter(ParameterSetName='ShowByWikiId', Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
+		[bool]$ShowHiddenPages,
 
 		[parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
 		[ValidateNotNullOrEmpty()]
@@ -18235,6 +16800,10 @@ function Get-CommunityWikitoc {
 			
 		if($PSBoundParameters.ContainsKey('WikiPageId')) {
 			$restParams['WikiPageId'] = $WikiPageId
+		}
+			
+		if($PSBoundParameters.ContainsKey('ShowHiddenPages')) {
+			$restParams['ShowHiddenPages'] = $ShowHiddenPages
 		}
 	
 		switch($PSCmdlet.ParameterSetName){
@@ -18278,4 +16847,4 @@ function Get-CommunityWikitoc {
 }
 
 
-Export-ModuleMember -Function  Get-CommunityAbuseappeal, Set-CommunityAbuseappeal, New-CommunityAbusereport, Get-CommunityAbusereport, Set-CommunityAbusereport, Get-CommunityAbusivecontent, Get-CommunityActivitymessage, New-CommunityActivitymessage, Remove-CommunityActivitymessage, Get-CommunityActivitystorysitepreference, Set-CommunityActivitystorysitepreference, Get-CommunityActivitystorytype, Get-CommunityActivitystoryuserpreference, Set-CommunityActivitystoryuserpreference, Get-CommunityAggregatetaggedcontent, Set-CommunityAggregatetag, Remove-CommunityAggregatetag, Get-CommunityAggregatetag, Get-CommunityBlogcomment, New-CommunityBlogcomment, Set-CommunityBlogcomment, Remove-CommunityBlogcomment, Get-CommunityBlogcontactrequest, New-CommunityBlogcontactrequest, Get-CommunityBlogfavorite, Remove-CommunityBlogfavorite, New-CommunityBlogfavorite, Get-CommunityBlogpost, New-CommunityBlogpost, Set-CommunityBlogpost, Remove-CommunityBlogpost, Get-CommunityBlogpostsubscription, Set-CommunityBlogpostsubscription, New-CommunityBlogpostsubscription, Get-CommunityBlogpostsummary, Get-CommunityBlog, New-CommunityBlog, Set-CommunityBlog, Remove-CommunityBlog, New-CommunityBookmark, Get-CommunityBookmark, Remove-CommunityBookmark, Get-CommunityCf, New-CommunityComment, Get-CommunityComment, Set-CommunityComment, Remove-CommunityComment, Get-CommunityContent, New-CommunityContenttag, Get-CommunityContenttag, Remove-CommunityContenttag, Set-CommunityContenttag, New-CommunityContentview, New-CommunityConversationmessage, Get-CommunityConversationmessage, Remove-CommunityConversationmessage, Remove-CommunityConversation, Get-CommunityEndpoint, Get-CommunityFavorite, Get-CommunityFeature, Get-CommunityFollower, Get-CommunityFollowing, New-CommunityFollowing, Remove-CommunityFollowing, Get-CommunityForumfavorite, Remove-CommunityForumfavorite, New-CommunityForumfavorite, Get-CommunityForumreply, New-CommunityForumreply, Set-CommunityForumreply, Remove-CommunityForumreply, Get-CommunityForum, New-CommunityForum, Set-CommunityForum, Remove-CommunityForum, Get-CommunityForumthread, New-CommunityForumthread, Set-CommunityForumthread, Remove-CommunityForumthread, New-CommunityFriendship, Get-CommunityFriendship, Remove-CommunityFriendship, Set-CommunityFriendship, Get-CommunityGallery, New-CommunityGallery, Set-CommunityGallery, Remove-CommunityGallery, Get-CommunityGalleryfavorite, Remove-CommunityGalleryfavorite, New-CommunityGalleryfavorite, Get-CommunityGroupcontactrequest, New-CommunityGroupcontactrequest, Remove-CommunityGroupcontactrequest, Get-CommunityGroup, New-CommunityGroup, Set-CommunityGroup, Remove-CommunityGroup, Get-CommunityGroupuser, New-CommunityGroupuser, Remove-CommunityGroupuser, Get-CommunityHashtag, Get-CommunityInfo, New-CommunityLike, Get-CommunityLike, Remove-CommunityLike, New-CommunityMedium, Set-CommunityMedium, Remove-CommunityMedium, Get-CommunityMedium, Get-CommunityMediacomment, New-CommunityMediacomment, Set-CommunityMediacomment, Remove-CommunityMediacomment, Get-CommunityMediasubscription, Set-CommunityMediasubscription, New-CommunityMediasubscription, Get-CommunityMentionable, Get-CommunityMention, Get-CommunityNodepermission, Get-CommunityNotificationdistributiontype, Set-CommunityNotificationpreference, Get-CommunityNotificationpreference, Set-CommunityNotification, Get-CommunityNotification, Remove-CommunityNotification, Get-CommunityNotificationtype, New-CommunityOauth, Get-CommunityOauth, Get-CommunityPermission, Get-CommunityPollitem, New-CommunityPollitem, Set-CommunityPollitem, Remove-CommunityPollitem, Get-CommunityPollitemvote, New-CommunityPollitemvote, Get-CommunityRateditem, New-CommunityRating, Get-CommunityRating, Remove-CommunityRating, New-CommunityReplymessage, Remove-CommunityReplymessage, Get-CommunityRole, New-CommunityRole, Set-CommunityRole, Remove-CommunityRole, Get-CommunitySearch, New-CommunitySearch, Set-CommunitySearch, Remove-CommunitySearch, New-CommunityStatusmessage, Get-CommunityStatusmessage, Remove-CommunityStatusmessage, Get-CommunityStory, Remove-CommunityStory, Get-CommunityUseravatar, Set-CommunityUseravatar, Remove-CommunityUseravatar, Get-CommunityUserinvitation, New-CommunityUserinvitation, Set-CommunityUserinvitation, Get-CommunityUserpresence, Set-CommunityUserpresence, Get-CommunityUserprofilefieldgroup, Get-CommunityUserprofilefield, New-CommunityUser, Get-CommunityUser, Set-CommunityUser, Remove-CommunityUser, New-CommunityUservalidation, Get-CommunityWikicomment, New-CommunityWikicomment, Set-CommunityWikicomment, Remove-CommunityWikicomment, Get-CommunityWikifavorite, Remove-CommunityWikifavorite, New-CommunityWikifavorite, New-CommunityWikifile, Get-CommunityWikipagecommentsubscription, New-CommunityWikipagecommentsubscription, Set-CommunityWikipagecommentsubscription, Get-CommunityWikipagerevision, Remove-CommunityWikipagerevision, Get-CommunityWikipage, Set-CommunityWikipage, New-CommunityWikipage, Get-CommunityWikipagesubscription, Set-CommunityWikipagesubscription, New-CommunityWikipagesubscription, Get-CommunityWiki, New-CommunityWiki, Set-CommunityWiki, Remove-CommunityWiki, Get-CommunityWikitoc
+Export-ModuleMember -Function  Get-CommunityAbuseappeal, Set-CommunityAbuseappeal, New-CommunityAbusereport, Get-CommunityAbusereport, Set-CommunityAbusereport, Get-CommunityAbusivecontent, Get-CommunityActivitymessage, Get-CommunityActivitystorysitepreference, Set-CommunityActivitystorysitepreference, Get-CommunityActivitystorytype, Get-CommunityActivitystoryuserpreference, Set-CommunityActivitystoryuserpreference, Get-CommunityAggregatetaggedcontent, Remove-CommunityAggregatetag, Get-CommunityAggregatetag, Get-CommunityBlogcontactrequest, New-CommunityBlogcontactrequest, Get-CommunityBlogpost, New-CommunityBlogpost, Set-CommunityBlogpost, Remove-CommunityBlogpost, Get-CommunityBlogpostsubscription, Set-CommunityBlogpostsubscription, New-CommunityBlogpostsubscription, Get-CommunityBlogpostsummary, Get-CommunityBlog, New-CommunityBlog, Set-CommunityBlog, Remove-CommunityBlog, New-CommunityBookmark, Get-CommunityBookmark, Remove-CommunityBookmark, Get-CommunityCf, New-CommunityComment, Get-CommunityComment, Set-CommunityComment, Remove-CommunityComment, Get-CommunityContent, New-CommunityContenttag, Get-CommunityContenttag, Remove-CommunityContenttag, Set-CommunityContenttag, New-CommunityContentview, New-CommunityConversationmessage, Get-CommunityConversationmessage, Remove-CommunityConversationmessage, Remove-CommunityConversation, Get-CommunityEndpoint, Get-CommunityFeature, Get-CommunityFollower, Get-CommunityFollowing, New-CommunityFollowing, Remove-CommunityFollowing, Get-CommunityForumreply, New-CommunityForumreply, Set-CommunityForumreply, Remove-CommunityForumreply, Get-CommunityForum, New-CommunityForum, Set-CommunityForum, Remove-CommunityForum, Get-CommunityForumthread, New-CommunityForumthread, Set-CommunityForumthread, Remove-CommunityForumthread, New-CommunityFriendship, Get-CommunityFriendship, Remove-CommunityFriendship, Set-CommunityFriendship, Get-CommunityGallery, New-CommunityGallery, Set-CommunityGallery, Remove-CommunityGallery, Get-CommunityGroupavatar, Set-CommunityGroupavatar, Remove-CommunityGroupavatar, Get-CommunityGroupcontactrequest, New-CommunityGroupcontactrequest, Remove-CommunityGroupcontactrequest, Get-CommunityGroup, New-CommunityGroup, Set-CommunityGroup, Remove-CommunityGroup, Get-CommunityGroupuser, New-CommunityGroupuser, Remove-CommunityGroupuser, Get-CommunityHashtag, Get-CommunityInfo, New-CommunityLike, Get-CommunityLike, Remove-CommunityLike, New-CommunityMedium, Set-CommunityMedium, Remove-CommunityMedium, Get-CommunityMedium, Get-CommunityMediasubscription, Set-CommunityMediasubscription, New-CommunityMediasubscription, Get-CommunityMentionable, Get-CommunityMention, Get-CommunityNodepermission, Get-CommunityNotificationdistributiontype, Set-CommunityNotificationpreference, Get-CommunityNotificationpreference, Set-CommunityNotification, Get-CommunityNotification, Remove-CommunityNotification, Get-CommunityNotificationtype, New-CommunityOauth, Get-CommunityOauth, Get-CommunityPermission, Get-CommunityRateditem, New-CommunityRating, Get-CommunityRating, Remove-CommunityRating, New-CommunityReplymessage, Remove-CommunityReplymessage, Get-CommunityRole, New-CommunityRole, Set-CommunityRole, Remove-CommunityRole, Get-CommunitySearch, New-CommunitySearch, Set-CommunitySearch, Remove-CommunitySearch, New-CommunityStatusmessage, Get-CommunityStatusmessage, Remove-CommunityStatusmessage, Get-CommunityStory, Remove-CommunityStory, Get-CommunityUseravatar, Set-CommunityUseravatar, Remove-CommunityUseravatar, Get-CommunityUserinvitation, New-CommunityUserinvitation, Set-CommunityUserinvitation, Get-CommunityUserpresence, Set-CommunityUserpresence, Get-CommunityUserprofilefieldgroup, Get-CommunityUserprofilefield, New-CommunityUser, Get-CommunityUser, Set-CommunityUser, Remove-CommunityUser, New-CommunityUservalidation, New-CommunityWikifile, Get-CommunityWikipagecommentsubscription, New-CommunityWikipagecommentsubscription, Set-CommunityWikipagecommentsubscription, Get-CommunityWikipagerevision, Remove-CommunityWikipagerevision, Get-CommunityWikipage, Set-CommunityWikipage, New-CommunityWikipage, Get-CommunityWikipagesubscription, Set-CommunityWikipagesubscription, New-CommunityWikipagesubscription, Get-CommunityWiki, New-CommunityWiki, Set-CommunityWiki, Remove-CommunityWiki, Get-CommunityWikitoc

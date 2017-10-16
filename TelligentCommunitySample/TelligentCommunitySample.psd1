@@ -16,7 +16,7 @@ Author = @('Alex Crome', 'Rich Mercer')
 CompanyName = 'Telligent Systems, Inc.'
 
 # Copyright statement for this module
-Copyright = '(c) 2014 Alex Crome, Rich Mercer. All rights reserved.'
+Copyright = '(c) 2017 Alex Crome, Rich Mercer. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'Create sample data for Telligent Community imstances.'

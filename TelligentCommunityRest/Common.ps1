@@ -142,9 +142,10 @@ function Write-RestErrors
     if ($response) {
         $response.Errors |% { Write-Error -Message $_ }
         $response.Warnings |% { Write-Warning -Message $_ }
-        try{
-            $response.Info |% { Write-Host $_ -ErrorAction SilentlyContinue }
-        }
+
+        #Can't write-Host via remoting / workflows
+        #Hate the Try/Catch but can't find a better way to detect
+        try{ $response.Info |% { Write-Host $_ -ErrorAction SilentlyContinue }}
         catch {}
     }
 }
@@ -243,7 +244,7 @@ function Invoke-CommunityRestRequest
                 -Body $body `
                 -MaximumRedirection 0 `
                 -Method $(if ($Method -eq 'GET') { 'GET' } else { 'POST'}) `
-                -UserAgent 'Zimbra Community Powershell REST Client' `
+                -UserAgent 'Telligent Community Powershell REST Client' `
 				@splat
         }
         catch [System.Net.WebException] {

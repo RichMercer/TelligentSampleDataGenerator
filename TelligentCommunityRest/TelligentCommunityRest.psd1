@@ -16,7 +16,7 @@ Author = @('Alex Crome', 'Rich Mercer')
 CompanyName = 'Telligent Systems, Inc.'
 
 # Copyright statement for this module
-Copyright = '(c) 2014 Alex Crome, Rich Mercer. All rights reserved.'
+Copyright = '(c) 2017 Alex Crome, Rich Mercer. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'Provides access to Telligent Community REST APIs.'
@@ -43,7 +43,7 @@ ProcessorArchitecture = ''
 RequiredModules = @()
 
 # Assemblies that must be loaded prior to importing this module
-RequiredAssemblies = @('Zimbra.Community.PowershellRest.dll')
+RequiredAssemblies = @('Telligent.Community.PowershellRest.dll')
 
 # Script files (.ps1) that are run in the caller's environment prior to importing this module
 ScriptsToProcess = @()
