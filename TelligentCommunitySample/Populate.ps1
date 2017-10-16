@@ -449,7 +449,7 @@ function Initialize-CommunitySampleGalleryFile {
 			Split-path $file -Leaf
         }
 
-        $file = New-CommunityMedium @splat `
+        $file = New-CommunityMedia @splat `
             -MediaGalleryId $GalleryId `
             -Name (Get-RandomTitle) `
             -Description (Get-RandomHtml -MaxParagraphs 20) `
