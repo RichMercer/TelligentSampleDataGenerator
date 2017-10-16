@@ -12,29 +12,32 @@ workflow Initialize-CommunitySampleGroup {
         [CommunityCredential]$Credential
     )
     #TODO: Add support for joinless groups
-    # Joinless groups don't support membership, so the following fials
+    # Joinless groups don't support membership, so the following fails
     # For $Contributors, just create new site users
     # For $Creators, create them as Group Owners
     # Need to fix Get-CommunityGroup -GroupId so it returns the correct group rather than the root group
     # This is an issue with the code generated API to be resolved.
 
-    if(!$Creator) {
-        $Creator = (Initialize-CommunitySampleGroupMember `
-                        -GroupId $GroupId `
-                        -MemberType Manager `
-                        -Min 3 `
-                        -Maximum 6 `
-                        -Credential $Credential
-                   ).Username
-    }
-
-    if(!$Contributor) {
-        $Contributor = (Initialize-CommunitySampleGroupMember `
+    $group = Get-CommunityGroup -Id $GroupId -Credential $Credential
+    
+    if($group.GroupType -ne 'Joinless') {
+        if(!$Creator) {
+            $Creator = (Initialize-CommunitySampleGroupMember `
                             -GroupId $GroupId `
+                            -MemberType Manager `
+                            -Min 3 `
+                            -Maximum 6 `
                             -Credential $Credential
-                        ).Username + $Creator
-    }
+                       ).Username
+        }
 
+        if(!$Contributor) {
+            $Contributor = (Initialize-CommunitySampleGroupMember `
+                                -GroupId $GroupId `
+                                -Credential $Credential
+                            ).Username + $Creator
+        }
+    }
 
     #Would like to use foreach -parallel() here, but that seems to have problem loading the assembly containing [CommunityCredential]
     parallel {

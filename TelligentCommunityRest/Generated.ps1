@@ -8277,7 +8277,7 @@ function Get-CommunityGroup {
 				$pageable = $True
 			}
 			'Show2' {
-				$endpoint= "api.ashx/v2/groups/root.json"
+				$endpoint= "api.ashx/v2/groups/${Id}.json"
 				$method = 'GET'
 				$pageable = $False
 			}
