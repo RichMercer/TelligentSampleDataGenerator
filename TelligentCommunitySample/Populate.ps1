@@ -445,6 +445,8 @@ function Initialize-CommunitySampleGalleryFile {
             $file = Get-RandomFile
             $splat['FileName'] = Split-path $file -Leaf
             $splat['FileData'] = Get-Content $file -Encoding Byte
+			
+			Split-path $file -Leaf
         }
 
         $file = New-CommunityMedium @splat `
