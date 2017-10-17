@@ -19,7 +19,7 @@ CompanyName = 'Telligent Systems, Inc.'
 Copyright = '(c) 2017 Alex Crome, Rich Mercer. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'Provides access to Telligent Community REST APIs.'
+Description = 'Provides access to Telligent Community via REST APIs.'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '5.0'
