@@ -19,16 +19,16 @@ CompanyName = 'Telligent Systems, Inc.'
 Copyright = '(c) 2017 Alex Crome, Rich Mercer. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'Create sample data for Telligent Community imstances.'
+Description = 'Create sample data for Telligent Community instances.'
 
 # Minimum version of the Windows PowerShell engine required by this module
-PowerShellVersion = '3.0'
+PowerShellVersion = '5.0'
 
 # Name of the Windows PowerShell host required by this module
 PowerShellHostName = ''
 
 # Minimum version of the Windows PowerShell host required by this module
-PowerShellHostVersion = ''
+PowerShellHostVersion = '5.0'
 
 # Minimum version of the .NET Framework required by this module
 DotNetFrameworkVersion = '4.5'
