@@ -11,7 +11,8 @@ The current weightings of how we decide how much data to generate is based aroun
 The sample data generation scripts are published to the PowerShell gallery and can be installed by running the following command at the PowerShell prompt.
 
 ```powershell
-PS> Install-Module -Name TelligentCommunitySample
+Set-ExecutionPolicy RemoteSigned
+Install-Module -Name TelligentCommunitySample
 ```
 
 ## Credentials
